@@ -1,8 +1,8 @@
 # 2026spring-cs201: DS Algo（数据结构与算法）
 
-*Updated 2026-06-11 14:09 GMT+8*  
- *Compiled by Hongfei Yan (2026 Winter)*  
-*项目仓库：[GMyhf/2026spring-cs201](https://github.com/GMyhf/2026spring-cs201/)*
+*Updated 2026-08-29 23:50 GMT+8*  
+ *Compiled by Hongfei Yan (2026 Fall)*  
+*项目仓库：[GMyhf/2026fall-cs201cq](https://github.com/GMyhf/2026fall-cs201cq/)*
 
 ------
 
@@ -53,11 +53,6 @@
   - 环境配置指南：
     *   [Python 开发环境搭建 (Mac & Windows)](https://github.com/GMyhf/2026spring-cs201/blob/main/Python_Development_Setup_Mac_Windows.md)
     *   [在 VS Code 中配置 C++ 编程环境](https://github.com/GMyhf/2026spring-cs201/blob/main/Writing_First_C%2B%2B_Program_in_VS-Code.md)
-- **AI辅助自学平台**：
-
-  - **小北智学平台**：登录 [zx.pku.edu.cn](https://zx.pku.edu.cn/)，加入“**数据结构与算法B（闫宏飞）**”课程。可利用 **AI 助教** 进行问答式学习。如有疑问，请通过邮件联系：[yanhf@pku.edu.cn](mailto:yanhf@pku.edu.cn)
-
-  *   **提问举例**：“请详细总结本课程知识库的内容”，“本课程的大纲和核心内容有哪些？”
 
 
 ------
@@ -77,7 +72,7 @@
 
 ## 4 重要注意事项
 
-若同学的先修课程非闫宏飞老师开设的《计算机概论B》，强烈建议在开课前完成 **LeetCode 热题 100**。
+建议在开课前完成 **LeetCode 热题 100**。
 
 *   **预习范围**：可暂不包含“链表”（14题）和“二叉树”（15题）。
 *   **目标**：通过刷题消除编程语言隔阂，确保能跟上数算课程的教学节奏。
