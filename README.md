@@ -1,4 +1,4 @@
-# 2026spring-cs201: DS Algo（数据结构与算法）
+# 2026fall-cs201cq: DS Algo（数据结构与算法）
 
 *Updated 2026-08-29 23:50 GMT+8*  
  *Compiled by Hongfei Yan (2026 Fall)*  
