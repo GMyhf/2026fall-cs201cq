@@ -1,6 +1,6 @@
 # 2026fall-cs201cq: DS Algo（数据结构与算法）
 
-*Updated 2026-08-30 15:20 GMT+8*  
+*Updated 2026-08-30 16:20 GMT+8*  
  *Compiled by Hongfei Yan (2026 Fall)*  
 *项目仓库：[GMyhf/2026fall-cs201cq](https://github.com/GMyhf/2026fall-cs201cq/)*
 
@@ -48,6 +48,16 @@
 | 第 15 周 | [散列表、KMP、倒排索引 → RAG](202612_DSA_W15_Hash_KMP_InvertedIndex_RAG.md) | 冲突解决；next 数组；TF-IDF/BM25 与 RAG |
 | 第 16 周 | [课程总结与复习](202612_DSA_W16_Review.md) | 知识体系梳理、模板代码库、考试要点 |
 | 第 17 周 | [期末上机考试](202612_DSA_W17_Final_Machine_Exam.md) | 命题方案、样卷 6 题与参考解答、备选题库 |
+
+### 课件 PPTX
+
+课堂放映用的 PowerPoint 课件放在独立目录 **[`slides/`](slides/)** 中（与上表的 Markdown 讲义同名对应，共 16 个文件、488 页）。
+课件由脚本从结构化内容生成，见 [`slides/README.md`](slides/README.md)：
+
+```bash
+pip install python-pptx
+cd slides && python3 build_all.py        # 重新生成全部课件
+```
 
 ### 考核方式
 
