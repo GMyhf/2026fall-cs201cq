@@ -75,7 +75,7 @@ https://github.com/GMyhf/2026fall-cs201cq
 - OpenJudge：http://cs101.openjudge.cn/
 - LeetCode 热题 100：https://leetcode.cn/studyplan/top-100-liked/
 - 语言：以 Python 3 为主，坚持用 C++ 的同学课程同样支持。
-- 环境搭建见仓库中 `Python_Development_Setup_Mac_Windows.md`。
+- 环境搭建见 [`Python_Development_Setup_Mac_Windows.md`](../Python_Development_Setup_Mac_Windows.md)。
 
 ---
 

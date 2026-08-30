@@ -16,11 +16,17 @@ while code and algorithm names are English. Preserve the existing language of an
 
 ## Layout and naming conventions
 
-Root-level lecture notes follow `YYYYMM_DSA_W<week>_<topic>.md` (e.g.
-`202603_DSA_W02_BIT_Fenwick.md`, `202604_DSA_W06-08_Tree.md`). The `YYYYMM` / `W<week>` prefix
-encodes the teaching timeline — keep it consistent when adding or renaming notes. Exam and
-event-specific files use a `YYYYMMDD_` date prefix instead.
+Lecture notes follow `YYYYMM_DSA_W<week>_<topic>.md` (e.g. `202603_DSA_W02_BIT_Fenwick.md`,
+`202604_DSA_W06-08_Tree.md`). The `YYYYMM` / `W<week>` prefix encodes the teaching timeline — keep it
+consistent when adding or renaming notes. Exam and event-specific files use a `YYYYMMDD_` date prefix
+instead. Root level holds the 2026 spring (`202603_`–`202606_`) notes; the 2026 fall Chongqing course
+(weeks 2–17, `202609_`–`202612_`) lives in `slides/` alongside its decks.
 
+- `slides/` — **2026 Fall (Chongqing) weeks 2–17**: lecture notes and decks kept together, one
+  `.md` + one same-named `.pptx` per week. The `.pptx` files are **generated** from
+  `slides/content/wNN.py` by `slides/build_all.py` (layout engine in `slides/deck.py`) — edit the
+  content module and re-run, never hand-edit a `.pptx`. The `.md` notes are hand-maintained and are
+  the fuller version (complete worked solutions); keep the two consistent when editing either.
 - `homework/` — one file per assignment (`assignment1.md` … `assignmentP.md`); problem specs and grading rubrics.
 - `cheatsheet/` — student-contributed final-exam cheat sheets (`.md`, `.pdf`, `.docx`), named `<TOPIC>_<STUDENTNAME>`.
 - `20260609_ExamPreptoFrontierAI/` — slides/notes from a talk (mixed `.md`, `.pdf`, `.pptx`, `.png`, `.html`).

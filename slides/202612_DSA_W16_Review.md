@@ -537,4 +537,4 @@ def rob_tree(root):
 
 > 数据结构与算法是计算机科学的骨架，也是现代 AI 系统的地基。你们在这门课里手写的每一个堆、每一次 BFS、每一张倒排索引，都真实地运行在今天的搜索引擎与向量数据库里。祝考试顺利。
 
-**下周**：第 17 周期末上机考试（见 `202612_DSA_W17_Final_Machine_Exam.md`）。
+**下周**：第 17 周期末上机考试（见 [`202612_DSA_W17_Final_Machine_Exam.md`](202612_DSA_W17_Final_Machine_Exam.md)）。

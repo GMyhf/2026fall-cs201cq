@@ -1,39 +1,46 @@
-# 课件 PPTX（第 2–17 周）
+# 讲义与课件（第 2–17 周）
 
-*Updated 2026-08-30 16:20 GMT+8*
+*Updated 2026-08-30 16:45 GMT+8*
  *Compiled by Hongfei Yan (2026 Fall)*
 
-本目录存放《数据结构与算法》第 2–17 周的 **PowerPoint 课件**，与仓库根目录的
-Markdown 讲义一一对应（同名，仅扩展名不同），内容依据
-《重庆人工智能学院课程教学大纲-闫宏飞.docx》"四、教学内容、要求及进度安排"编写。
+本目录存放《数据结构与算法》第 2–17 周的**讲义（`.md`）与课件（`.pptx`）**，
+二者**同名成对**，内容依据《重庆人工智能学院课程教学大纲-闫宏飞.docx》
+"四、教学内容、要求及进度安排"编写。
 
-> 本目录**自成一体**，不与根目录既有材料混放。根目录的 `.md` 是**讲义**（供学生阅读、
-> 含完整题解）；本目录的 `.pptx` 是**课件**（供课堂放映，只保留主干与关键代码）。
+| | 用途 | 特点 |
+| ---- | ---- | ---- |
+| `*.md` 讲义 | 课后阅读、作业参考 | 完整题解、可运行代码、习题与思考题 |
+| `*.pptx` 课件 | 课堂放映 | 只保留主干与关键代码，16:9 版面 |
+
+> 讲义与课件是一套东西，因此放在同一目录、成对维护：改讲义时顺手核对同名课件。
+> 本目录自成一体，与根目录 2026 spring 的既有材料互不混放。
 
 ---
 
 ## 1 文件清单
 
-| 周次 | 文件 | 页数 | 主题 |
-| ---- | ---- | ---- | ---- |
-| 2 | `202609_DSA_W02_Intro_ADT_OOP.pptx` | 33 | 导论、ADT 与 OOP、Python 基础回顾 |
-| 3 | `202609_DSA_W03_Algorithm_Analysis.pptx` | 31 | 大 O、复杂度级别、内建结构性能 |
-| 4 | `202609_DSA_W04_Stack.pptx` | 30 | 栈、括号匹配、进制转换、调度场算法 |
-| 5 | `202609_DSA_W05_Queue_Deque_LinkedList.pptx` | 32 | 队列、双端队列、顺序表与链表 |
-| 6 | `202610_DSA_W06_Recursion_Divide_Sorting.pptx` | 30 | 递归与分治、五大排序与性能对比 |
-| 7 | `202610_DSA_W07_Greedy_DP.pptx` | 30 | 贪心与动态规划 |
-| 8 | `202610_DSA_W08_Search_DFS_BFS_Backtracking.pptx` | 27 | DFS/BFS、回溯与剪枝 |
-| 9 | `202610_DSA_W09_Tree_Traversal.pptx` | 32 | 树的概念与二叉树遍历 |
-| 10 | `202611_DSA_W10_Heap_BST.pptx` | 29 | 堆、堆排序、二叉搜索树 |
-| 11 | `202611_DSA_W11_AVL_DisjointSet.pptx` | 31 | AVL 树、并查集 |
-| 12 | `202611_DSA_W12_Graph_Representation_Traversal.pptx` | 26 | 图的表示与遍历 |
-| 13 | `202611_DSA_W13_ShortestPath.pptx` | 28 | Dijkstra、Bellman-Ford、Floyd |
-| 14 | `202612_DSA_W14_MST_TopoSort.pptx` | 31 | 最小生成树、拓扑排序、DAG 应用 |
-| 15 | `202612_DSA_W15_Hash_KMP_InvertedIndex_RAG.pptx` | 32 | 散列表、KMP、倒排索引 → RAG |
-| 16 | `202612_DSA_W16_Review.pptx` | 32 | 总结复习、模板代码库、考试要点 |
-| 17 | `202612_DSA_W17_Final_Machine_Exam.pptx` | 34 | 上机考试命题方案与样卷 |
+每周一行，`.md` 与 `.pptx` 同名。
 
-合计 **488 页**。版面 16:9，中文字体 **微软雅黑**，代码字体 **Consolas**。
+| 周次 | 文件名（`.md` / `.pptx` 同名） | 课件页数 | 主题 |
+| ---- | ---- | ---- | ---- |
+| 2 | `202609_DSA_W02_Intro_ADT_OOP` | 33 | 导论、ADT 与 OOP、Python 基础回顾 |
+| 3 | `202609_DSA_W03_Algorithm_Analysis` | 31 | 大 O、复杂度级别、内建结构性能 |
+| 4 | `202609_DSA_W04_Stack` | 30 | 栈、括号匹配、进制转换、调度场算法 |
+| 5 | `202609_DSA_W05_Queue_Deque_LinkedList` | 32 | 队列、双端队列、顺序表与链表 |
+| 6 | `202610_DSA_W06_Recursion_Divide_Sorting` | 30 | 递归与分治、五大排序与性能对比 |
+| 7 | `202610_DSA_W07_Greedy_DP` | 30 | 贪心与动态规划 |
+| 8 | `202610_DSA_W08_Search_DFS_BFS_Backtracking` | 27 | DFS/BFS、回溯与剪枝 |
+| 9 | `202610_DSA_W09_Tree_Traversal` | 32 | 树的概念与二叉树遍历 |
+| 10 | `202611_DSA_W10_Heap_BST` | 29 | 堆、堆排序、二叉搜索树 |
+| 11 | `202611_DSA_W11_AVL_DisjointSet` | 31 | AVL 树、并查集 |
+| 12 | `202611_DSA_W12_Graph_Representation_Traversal` | 26 | 图的表示与遍历 |
+| 13 | `202611_DSA_W13_ShortestPath` | 28 | Dijkstra、Bellman-Ford、Floyd |
+| 14 | `202612_DSA_W14_MST_TopoSort` | 31 | 最小生成树、拓扑排序、DAG 应用 |
+| 15 | `202612_DSA_W15_Hash_KMP_InvertedIndex_RAG` | 32 | 散列表、KMP、倒排索引 → RAG |
+| 16 | `202612_DSA_W16_Review` | 32 | 总结复习、模板代码库、考试要点 |
+| 17 | `202612_DSA_W17_Final_Machine_Exam` | 34 | 上机考试命题方案与样卷 |
+
+课件合计 **488 页**，版面 16:9，中文字体 **微软雅黑**，代码字体 **Consolas**。
 
 ---
 
@@ -43,14 +50,18 @@ Markdown 讲义一一对应（同名，仅扩展名不同），内容依据
 
 ```
 slides/
-├── deck.py            # 排版引擎：主题配色、版面构件、自适应字号
-├── build_all.py       # 生成入口
-├── content/
-│   ├── w02.py         # 第 2 周的内容（META + SLIDES）
-│   ├── ...
-│   └── w17.py
-└── *.pptx             # 生成结果
+├── 2026NN_DSA_WNN_*.md    # 讲义（手写维护）
+├── 2026NN_DSA_WNN_*.pptx  # 课件（由下面的脚本生成）
+├── deck.py                # 排版引擎：主题配色、版面构件、自适应字号
+├── build_all.py           # 生成入口
+└── content/
+    ├── w02.py             # 第 2 周课件的内容（META + SLIDES）
+    ├── ...
+    └── w17.py
 ```
+
+⚠️ **不要直接编辑 `.pptx`** —— 它会被下次生成覆盖。改课件请改 `content/wNN.py`。
+讲义 `.md` 则是手写维护的，与 `content/` 无生成关系；两者内容需人工保持一致。
 
 **环境**：
 
