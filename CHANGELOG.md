@@ -145,3 +145,16 @@
 - `slides/README.md` 更名为“讲义与课件”，说明两者分工，并强调
   **`.pptx` 由脚本生成、不要手工编辑**，`.md` 为手写维护。
 - `CLAUDE.md` 的目录约定同步更新，注明 2026 fall 讲义位于 `slides/`。
+
+---
+
+## 2026-08-30 — 目录 `slides/` 更名为 `courseware/`
+
+该目录同时存放讲义（`.md`）与课件（`.pptx`），"slides"（幻灯片）只描述了其中一半，
+故更名为 `courseware/`（课件资料），语义更贴切。
+
+- 用 `git mv` 整目录重命名，51 个文件全部识别为 rename，**内容零改动**。
+- 同步更新引用：`README.md` 的目录表与生成命令、`courseware/README.md` 的目录树与
+  渲染命令、`CLAUDE.md` 的目录约定。
+- 新增 `courseware/.gitignore`，忽略 `__pycache__/` 与 `*.pyc`。
+- 本文件中 2026-08-30 早先两条记录仍写作 `slides/`，为当时的真实路径，按变更日志惯例保留。

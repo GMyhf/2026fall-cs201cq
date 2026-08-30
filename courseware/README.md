@@ -1,6 +1,6 @@
 # 讲义与课件（第 2–17 周）
 
-*Updated 2026-08-30 16:45 GMT+8*
+*Updated 2026-08-30 17:05 GMT+8*
  *Compiled by Hongfei Yan (2026 Fall)*
 
 本目录存放《数据结构与算法》第 2–17 周的**讲义（`.md`）与课件（`.pptx`）**，
@@ -49,7 +49,7 @@
 课件**不是手工排版的**，而是由脚本从结构化内容生成，便于批量修改样式与逐年复用。
 
 ```
-slides/
+courseware/
 ├── 2026NN_DSA_WNN_*.md    # 讲义（手写维护）
 ├── 2026NN_DSA_WNN_*.pptx  # 课件（由下面的脚本生成）
 ├── deck.py                # 排版引擎：主题配色、版面构件、自适应字号
@@ -72,7 +72,7 @@ pip install python-pptx
 **生成**：
 
 ```bash
-cd slides
+cd courseware
 python3 build_all.py           # 生成全部 16 个 pptx
 python3 build_all.py 07 12     # 只重新生成第 7、12 周
 ```
@@ -105,7 +105,7 @@ python3 build_all.py 07 12     # 只重新生成第 7、12 周
 生成后可用 LibreOffice 渲染为 PDF，再机器检查排版：
 
 ```bash
-libreoffice --headless --convert-to pdf --outdir /tmp/render slides/*.pptx
+libreoffice --headless --convert-to pdf --outdir /tmp/render courseware/*.pptx
 ```
 
 本次交付前已完成的检查：

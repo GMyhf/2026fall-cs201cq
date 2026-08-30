@@ -20,16 +20,16 @@ Lecture notes follow `YYYYMM_DSA_W<week>_<topic>.md` (e.g. `202603_DSA_W02_BIT_F
 `202604_DSA_W06-08_Tree.md`). The `YYYYMM` / `W<week>` prefix encodes the teaching timeline — keep it
 consistent when adding or renaming notes. Exam and event-specific files use a `YYYYMMDD_` date prefix
 instead. Root level holds the 2026 spring (`202603_`–`202606_`) notes; the 2026 fall Chongqing course
-(weeks 2–17, `202609_`–`202612_`) lives in `slides/` alongside its decks.
+(weeks 2–17, `202609_`–`202612_`) lives in `courseware/` alongside its decks.
 
-- `slides/` — **2026 Fall (Chongqing) weeks 2–17**: lecture notes and decks kept together, one
+- `courseware/` — **2026 Fall (Chongqing) weeks 2–17**: lecture notes and decks kept together, one
   `.md` + one same-named `.pptx` per week. The `.pptx` files are **generated** from
-  `slides/content/wNN.py` by `slides/build_all.py` (layout engine in `slides/deck.py`) — edit the
+  `courseware/content/wNN.py` by `courseware/build_all.py` (layout engine in `courseware/deck.py`) — edit the
   content module and re-run, never hand-edit a `.pptx`. The `.md` notes are hand-maintained and are
   the fuller version (complete worked solutions); keep the two consistent when editing either.
 - `homework/` — one file per assignment (`assignment1.md` … `assignmentP.md`); problem specs and grading rubrics.
 - `cheatsheet/` — student-contributed final-exam cheat sheets (`.md`, `.pdf`, `.docx`), named `<TOPIC>_<STUDENTNAME>`.
-- `20260609_ExamPreptoFrontierAI/` — slides/notes from a talk (mixed `.md`, `.pdf`, `.pptx`, `.png`, `.html`).
+- `20260609_ExamPreptoFrontierAI/` — courseware/notes from a talk (mixed `.md`, `.pdf`, `.pptx`, `.png`, `.html`).
 - `game_*.py` — standalone pygame programs (`game_Sudoku.py`, `game_Minesweeper.py`, `game_PokerMachine.py`); each is self-contained.
 - `README.md` — course syllabus, schedule, grading rules, and links (the authoritative course overview).
 
