@@ -54,3 +54,44 @@
 - `686b022` Proofread graph theory notes
 - `3164610` / `775330f` Proofread DSA written exam materials
 - `7a8d6ec` Proofread DSA written exam without solutions
+
+---
+
+## 2026-08-30 — 新增第 2–17 周课件（2026 Fall / 重庆人工智能学院）
+
+依据《重庆人工智能学院课程教学大纲-闫宏飞.docx》"四、教学内容、要求及进度安排"，
+新建覆盖第 2–17 周的全套课件，共 16 个文件。每份课件包含：大纲对应的教学内容与要求、
+知识点清单、完整可运行的 Python 实现（非伪代码）、OpenJudge / LeetCode 例题与题解、
+本周作业、实验安排、思考题与小结。
+
+### 新增文件
+
+| 文件 | 周次 / 内容 |
+| ---- | ---- |
+| `202609_DSA_W02_Intro_ADT_OOP.md` | 第 2 周 导论、ADT 与 OOP、Python 基础回顾 |
+| `202609_DSA_W03_Algorithm_Analysis.md` | 第 3 周 算法分析：大 O、复杂度级别、内建结构性能 |
+| `202609_DSA_W04_Stack.md` | 第 4 周 栈：括号匹配、进制转换、调度场算法 |
+| `202609_DSA_W05_Queue_Deque_LinkedList.md` | 第 5 周 队列、双端队列；顺序表与链表 |
+| `202610_DSA_W06_Recursion_Divide_Sorting.md` | 第 6 周 递归与分治；五大排序与性能对比 |
+| `202610_DSA_W07_Greedy_DP.md` | 第 7 周 贪心与动态规划 |
+| `202610_DSA_W08_Search_DFS_BFS_Backtracking.md` | 第 8 周 搜索专题：DFS/BFS、回溯与剪枝 |
+| `202610_DSA_W09_Tree_Traversal.md` | 第 9 周 树的概念与二叉树遍历 |
+| `202611_DSA_W10_Heap_BST.md` | 第 10 周 堆、堆排序、二叉搜索树 |
+| `202611_DSA_W11_AVL_DisjointSet.md` | 第 11 周 AVL 树；并查集 |
+| `202611_DSA_W12_Graph_Representation_Traversal.md` | 第 12 周 图的表示与遍历 |
+| `202611_DSA_W13_ShortestPath.md` | 第 13 周 Dijkstra、Bellman-Ford、Floyd-Warshall |
+| `202612_DSA_W14_MST_TopoSort.md` | 第 14 周 最小生成树；拓扑排序；DAG 应用 |
+| `202612_DSA_W15_Hash_KMP_InvertedIndex_RAG.md` | 第 15 周 散列表、KMP、倒排索引 → RAG |
+| `202612_DSA_W16_Review.md` | 第 16 周 总结与复习：知识体系、模板代码库、考试要点 |
+| `202612_DSA_W17_Final_Machine_Exam.md` | 第 17 周 期末上机考试命题方案与样卷 |
+
+### 说明
+
+- 文件名中的 `YYYYMM` 按秋季学期周次对应月份编排（第 2–5 周 → 09，第 6–9 周 → 10，
+  第 10–13 周 → 11，第 14–17 周 → 12）。
+- 第 15 周把散列表与倒排索引延伸到 TF-IDF / BM25 与 RAG，落实大纲"创新与前沿目标"中
+  "AI 大模型实践内容"的要求，并给出 AI 辅助算法实践小项目（占总评 10%）的选题建议。
+- 第 17 周为面向教师的命题方案：知识点覆盖矩阵、6 题样卷（题面 + 样例 + 参考解答 +
+  数据构造建议 + 评分标准）、分类备选题库，以及命题/阅卷检查清单。
+  6 份参考解答均已在本地运行，输出与题面样例逐一核对一致。
+- `README.md` 新增"课件目录"一节，链接全部 16 份课件并列出考核方式。
