@@ -12,12 +12,14 @@
   5. 语法     讲义里的 ```python 代码块、以及 courseware/*.py 全部能被解析
   6. 可重生成 课件能从 content/wNN.py 重新生成，页数与 README 表格声明一致
   7. OJ题号   （可选，需联网）抓 cs101.openjudge.cn 的题目标题，与讲义里的叫法比对
-  8. 渲染     （可选，需 libreoffice + pdftotext）渲染全部页面，检查文字未越出版心
+  8. LC题号   （可选，需联网）走 leetcode.cn 官方 GraphQL 核对题号与中文题名
+  9. 渲染     （可选，需 libreoffice + pdftotext）渲染全部页面，检查文字未越出版心
 
 用法:
   python3 tools/verify_courseware.py              # 1–6，秒级
   python3 tools/verify_courseware.py --check-oj   # 加第 7 项，约 30 秒（需联网）
-  python3 tools/verify_courseware.py --render     # 加第 8 项，约 2–4 分钟
+  python3 tools/verify_courseware.py --check-lc   # 加第 8 项，约 30 秒（需联网）
+  python3 tools/verify_courseware.py --render     # 加第 9 项，约 2–4 分钟
 """
 import argparse
 import ast
@@ -309,7 +311,110 @@ def check_oj_titles(found: dict[str, Path]) -> None:
         notes.append(f"  ↳ 有意偏离：{a}")
 
 
-# ---------------------------------------------------------------- 8 渲染
+# ---------------------------------------------- 8 LeetCode 题号（需联网）
+# Codex 第 2 轮探明：leetcode.cn 的官方 GraphQL 能按 slug 返回题号与中文题名，
+# 页面客户端渲染抓不到题名这个障碍就绕开了。于是 LC 侧也能自动核。
+LC_GQL = "https://leetcode.cn/graphql/"
+LC_QUERY = ("query q($titleSlug:String!){question(titleSlug:$titleSlug)"
+            "{questionFrontendId translatedTitle}}")
+LC_URL_RE = re.compile(r"https://leetcode\.cn/problems/([a-z0-9\-]+)/")
+# 同一行里出现的题号，如 "LC 207 / 210"、"LeetCode 面试题 08.06"
+LC_NUM_RE = re.compile(r"(?:LC|LeetCode)\s*(面试题\s*[\d.]+|\d+(?:\s*/\s*\d+)*)")
+LC_NAMED_RE = re.compile(r"\*\*L(?:eet)?C(?:ode)? ([\d.]+|面试题 [\d.]+)\.\s*([^*]+?)\*\*"
+                         r"[，,]\s*https://leetcode\.cn/problems/([a-z0-9\-]+)/")
+
+# 与 OJ 同形状：题号 -> {允许的别名: 理由}
+LC_TITLE_ALLOW: dict[str, dict[str, str]] = {}
+
+
+def _lc_meta(slug: str):
+    import json
+    import urllib.error
+    import urllib.request
+    body = json.dumps({"query": LC_QUERY, "variables": {"titleSlug": slug}}).encode()
+    req = urllib.request.Request(LC_GQL, data=body,
+                                 headers={"Content-Type": "application/json",
+                                          "User-Agent": "courseware-verify/1.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=25) as r:
+            q = json.loads(r.read().decode("utf-8", "replace")).get("data", {}).get("question")
+    except (urllib.error.URLError, OSError, ValueError):
+        return None
+    if not q:
+        return None
+    return q.get("questionFrontendId"), (q.get("translatedTitle") or "").strip()
+
+
+def check_lc_titles(found: dict[str, Path]) -> None:
+    import time
+
+    files = sorted(found.values()) + sorted((CW / "content").glob("*.py"))
+    # 逐处记录，不做跨处汇总。
+    # 教训：OJ 那项修过的"一处正确掩盖其余错误"，我在这里又犯了一遍 ——
+    # 把各处题号并成一个集合，house-robber 在别处的正确号 198 就把
+    # 误标成 70 的那一处放过去了（变异 3 漏网）。所以按 (文件, 行) 独立校验。
+    occ: list[tuple[str, set[str], str, int]] = []      # slug, 该行题号, 文件, 行号
+    names: dict[str, set[str]] = {}
+    for f in files:
+        text = f.read_text(encoding="utf-8")
+        for lineno, line in enumerate(text.splitlines(), 1):
+            for slug in LC_URL_RE.findall(line):
+                got = set()
+                for tok in LC_NUM_RE.findall(line):
+                    for part in tok.split("/"):
+                        got.add(re.sub(r"\s+", " ", part).strip())
+                occ.append((slug, got, f.name, lineno))
+        for num, name, slug in LC_NAMED_RE.findall(text):
+            names.setdefault(slug, set()).add(name.strip())
+
+    meta_cache: dict[str, tuple[str, str] | None] = {}
+
+    def meta_of(slug):
+        if slug not in meta_cache:
+            meta_cache[slug] = _lc_meta(slug)
+            time.sleep(0.4)
+        return meta_cache[slug]
+
+    unreachable, mismatched, allowed = set(), 0, []
+    for slug, declared, fname, lineno in occ:
+        m = meta_of(slug)
+        if m is None:
+            unreachable.add(slug)
+            continue
+        fid, title = m
+        if declared and fid not in declared:
+            mismatched += 1
+            fail("LC题号", f"{fname}:{lineno} {slug} 实际是 LC {fid}「{title}」，"
+                           f"该处标成 {' / '.join(sorted(declared))}")
+
+    norm = lambda x: re.sub(r"[\s（(].*$", "", x).strip()
+    for slug, declared_names in sorted(names.items()):
+        m = meta_of(slug)
+        if m is None:
+            continue
+        fid, title = m
+        wrong = [n for n in sorted(declared_names)
+                 if not (norm(n) == norm(title) or norm(title) in n or n in title)]
+        allow = LC_TITLE_ALLOW.get(fid, {})
+        unallowed = [n for n in wrong if n not in allow]
+        for n in wrong:
+            if n in allow:
+                allowed.append(f"LC {fid}「{n}」（{allow[n]}）")
+        if unallowed:
+            mismatched += 1
+            fail("LC题号", f"LC {fid} 官方题名「{title}」，讲义里写作「{' / '.join(unallowed)}」")
+
+    if unreachable:
+        fail("LC题号", f"{len(unreachable)} 个 slug 查不到（网络/接口变动？）："
+                       f"{', '.join(sorted(unreachable))}")
+    extra = f"，另有 {len(allowed)} 处已登记的有意偏离" if allowed else ""
+    notes.append(f"LC题号：{len(meta_cache) - len(unreachable)} 个 slug / {len(occ)} 处引用"
+                 f"已经官方 GraphQL 核对，不一致 {mismatched} 处{extra}")
+    for a in allowed:
+        notes.append(f"  ↳ 有意偏离：{a}")
+
+
+# ---------------------------------------------------------------- 9 渲染
 def check_render() -> None:
     soffice = shutil.which("libreoffice") or shutil.which("soffice")
     if not soffice or not shutil.which("pdftotext"):
@@ -352,6 +457,8 @@ def main() -> int:
     ap.add_argument("--render", action="store_true", help="附加渲染与排版越界检查（慢）")
     ap.add_argument("--check-oj", action="store_true",
                     help="附加 OJ 题号联网核对（需能访问 cs101.openjudge.cn）")
+    ap.add_argument("--check-lc", action="store_true",
+                    help="附加 LeetCode 题号联网核对（走官方 GraphQL）")
     opts = ap.parse_args()
 
     found = decks()
@@ -363,6 +470,8 @@ def main() -> int:
     check_regenerate()
     if opts.check_oj:
         check_oj_titles(found)
+    if opts.check_lc:
+        check_lc_titles(found)
     if opts.render:
         check_render()
 
