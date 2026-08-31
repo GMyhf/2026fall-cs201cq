@@ -75,3 +75,5 @@ LeetCode 的官方 `https://leetcode.cn/graphql/` 可用 `question(titleSlug)` �
 ### 闸门
 
 W17 课件已从 `content/w17.py` 重建，仍为 34 页；`/private/tmp/cs201cq-pptx-venv/bin/python tools/handoff.py --verify` 6 项全绿、总计 488 页。`VERIFY_RENDER=1` 未能运行，当前机缺少 LibreOffice；未将其写作渲染通过。
+
+**补充（2026-08-31）**：已安装 LibreOffice 26.8.0.3。以 `/private/tmp/cs201cq-pptx-venv/bin/python tools/handoff.py --verify` 并设置 `VERIFY_RENDER=1` 重跑：488 页全部渲染通过，文字越界 0 处。

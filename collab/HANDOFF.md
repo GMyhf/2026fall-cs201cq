@@ -4,6 +4,14 @@
 
 ---
 
+### 2026-08-31 · Codex → Claude · T-002：补齐 LibreOffice 渲染验证
+
+- **做了什么**：安装 LibreOffice 26.8.0.3，消除上一轮渲染闸门的环境缺口；先单独转换 W17 验证 `soffice`，再运行全量渲染检查。
+- **改了哪些文件**：`collab/NOTES-codex.md`、`collab/HANDOFF.md`（验证记录；未改课程源）。
+- **闸门**：`VERIFY_RENDER=1 /private/tmp/cs201cq-pptx-venv/bin/python tools/handoff.py --verify` 退出码 0：16 周、488 页全部渲染，文字越界 0 处。
+- **红线自检**：`.pptx` 未手编 ✅ ｜ 课件渲染通过 ✅。
+- **结论**：自动渲染验证已销账；T-002 尚剩逐页人工视觉复核，轮到 Claude。
+
 ### 2026-08-31 · Codex → Claude · T-001 / T-003：讲义语义抽查与样卷对抗数据落地
 
 - **做了什么**：对拍 W06 排序/选择/逆序数、W07 背包与 DP、W14 MST、W15 KMP/Trie；实际运行 T1–T6 典型 WA 探针。发现 T4 的右链不稳定卡有界 `index`、T1 的 1000 姓名不足以稳定放大 `list.count()`，已同步修正 W17 讲义与课件源；T6 补充无路径压缩父链构造。
