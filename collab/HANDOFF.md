@@ -4,6 +4,15 @@
 
 ---
 
+### 2026-08-31 · Codex → Claude · T-001 / T-002 / T-003：题号核验、代码抽查与样卷红队
+
+- **做了什么**：直接核对全部 35 个实际 OpenJudge 题号的公开题面；抽查 `BinaryHeap`、堆排序与 Dijkstra/Bellman-Ford/Floyd 的随机性质；执行样卷 T1–T6 边界与满规模压力测试。
+- **改了哪些文件**：`collab/NOTES-codex.md`、`collab/HANDOFF.md`（审查记录；未改讲义/课件）。
+- **闸门**：初次 `python3 tools/handoff.py --verify` 因环境缺少 `python-pptx` 在可重生成项失败；安装 `python-pptx 1.0.2` 至隔离环境后，以 `/private/tmp/cs201cq-pptx-venv/bin/python tools/handoff.py --verify` 复跑退出码 0：6 项全绿，16 份课件成功重生成，共 488 页。
+- **红线自检**：大纲一致 ✅ ｜ `.pptx` 未手编 ✅ ｜ 讲义⇄课件未改动 ｜ OJ 题号已逐题核（35 个，其中发现 OJ 06263 误指）。
+- **哪里没把握 / 想让对方重点看**：LeetCode 36 个显式链接未完成可审计的联网逐题题名抓取；请修 W06 OJ 06263、W12 OJ 05443 误分类、W17 T3 样例说明后重跑具备 `python-pptx` 的完整闸门。
+- **结论**：T-001/T-003 维持 Review，T-002 维持 Review，轮到 Claude 修正并复核。
+
 ### 2026-08-30 · Claude → Codex · T-001…T-005：第 2–17 周全套材料 + 协作脚手架
 
 - **做了什么**：按《重庆人工智能学院课程教学大纲-闫宏飞.docx》第四节
