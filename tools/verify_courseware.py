@@ -11,15 +11,16 @@
   4. 链接     所有本地 .md/.pptx/.py 链接可达
   5. 语法     讲义里的 ```python 代码块、以及 courseware/*.py 全部能被解析
   6. 可重生成 课件能从 content/wNN.py 重新生成，页数与 README 表格声明一致
-  7. OJ题号   （可选，需联网）抓 cs101.openjudge.cn 的题目标题，与讲义里的叫法比对
-  8. LC题号   （可选，需联网）走 leetcode.cn 官方 GraphQL 核对题号与中文题名
-  9. 渲染     （可选，需 libreoffice + pdftotext）渲染全部页面，检查文字未越出版心
+  7. 协作账目 collab/PLAN.md 看板格式，以及别处引用的 T-编号是否都在看板上
+  8. OJ题号   （可选，需联网）抓 cs101.openjudge.cn 的题目标题，与讲义里的叫法比对
+  9. LC题号   （可选，需联网）走 leetcode.cn 官方 GraphQL 核对题号与中文题名
+ 10. 渲染     （可选，需 libreoffice + pdftotext）渲染全部页面，检查文字未越出版心
 
 用法:
-  python3 tools/verify_courseware.py              # 1–6，秒级
-  python3 tools/verify_courseware.py --check-oj   # 加第 7 项，约 30 秒（需联网）
-  python3 tools/verify_courseware.py --check-lc   # 加第 8 项，约 30 秒（需联网）
-  python3 tools/verify_courseware.py --render     # 加第 9 项，约 2–4 分钟
+  python3 tools/verify_courseware.py              # 1–7，秒级
+  python3 tools/verify_courseware.py --check-oj   # 加第 8 项，约 30 秒（需联网）
+  python3 tools/verify_courseware.py --check-lc   # 加第 9 项，约 30 秒（需联网）
+  python3 tools/verify_courseware.py --render     # 加第 10 项，约 2–4 分钟
 """
 import argparse
 import ast
@@ -253,7 +254,55 @@ def check_regenerate() -> None:
         notes.append(f"可重生成：16 份课件重新生成成功，共 {total} 页，页数与 README 一致")
 
 
-# ------------------------------------------------------- 7 OJ 题号（需联网）
+# ------------------------------------------------------- 7 协作账目（collab/）
+# 起因：几次 PLAN 更新用了 str.replace 却没断言命中，对方先改过同几行后
+# 匹配失效、静默无操作，而我照旧宣称"已记入 PLAN" —— T-008…T-011 从未真正入账。
+# 与本项目其他缺陷同源：静默无操作而非大声失败。这里把账目对不上变成可检出。
+PLAN_ROW = re.compile(r"^\|\s*(?:~~)?(T-\d{3})(?:~~)?\s*\|(.*)$", re.M)
+TID = re.compile(r"\bT-\d{3}\b")
+STATUSES = {"Backlog", "In progress", "Review", "Done"}
+
+
+def check_collab() -> None:
+    collab = ROOT / "collab"
+    if not collab.is_dir():
+        return
+    plan = collab / "PLAN.md"
+    if not plan.is_file():
+        fail("协作账目", "collab/PLAN.md 不存在")
+        return
+    text = plan.read_text(encoding="utf-8")
+
+    board, malformed = {}, 0
+    for m in PLAN_ROW.finditer(text):
+        cols = [c.strip() for c in m.group(2).split("|")]
+        if cols and cols[-1] == "":
+            cols = cols[:-1]           # 去掉行尾竖线产生的空串
+        if len(cols) != 4:             # ID + 任务 + 状态 + 负责 + 备注 = 5 列
+            malformed += 1
+            fail("协作账目", f"{m.group(1)} 这一行有 {len(cols) + 1} 列，看板要求恰好 5 列"
+                             f"（多出的单元格在 GitHub 上会被直接丢弃）")
+            continue
+        if cols[1] not in STATUSES:
+            fail("协作账目", f"{m.group(1)} 的状态 {cols[1]!r} 不在 {sorted(STATUSES)} 中")
+        board[m.group(1)] = cols[1]
+
+    missing = {}
+    for f in sorted(collab.glob("*.md")):
+        if f.name == "PLAN.md":
+            continue
+        for tid in set(TID.findall(f.read_text(encoding="utf-8"))):
+            if tid not in board:
+                missing.setdefault(tid, []).append(f.name)
+    for tid, where in sorted(missing.items()):
+        fail("协作账目", f"{tid} 在 {', '.join(where)} 里被引用，但 PLAN 看板上没有这一条")
+
+    open_n = sum(1 for v in board.values() if v != "Done")
+    notes.append(f"协作账目：PLAN 看板 {len(board)} 条（未完成 {open_n}），"
+                 f"格式错 {malformed} 处，被引用但缺失 {len(missing)} 条")
+
+
+# ------------------------------------------------------- 8 OJ 题号（需联网）
 # 上一轮我判定"题号↔题名离线检不出来"——对，但那只说明它不能进默认闸门。
 # cs101.openjudge.cn 走明文 HTTP 可达（WebFetch 强制 https 才连不上），
 # 于是把它做成一项显式的联网检查：抓平台标题，与讲义/课件里的叫法比对。
@@ -336,7 +385,7 @@ def check_oj_titles(found: dict[str, Path]) -> None:
         notes.append(f"  ↳ 有意偏离：{a}")
 
 
-# ---------------------------------------------- 8 LeetCode 题号（需联网）
+# ---------------------------------------------- 9 LeetCode 题号（需联网）
 # Codex 第 2 轮探明：leetcode.cn 的官方 GraphQL 能按 slug 返回题号与中文题名，
 # 页面客户端渲染抓不到题名这个障碍就绕开了。于是 LC 侧也能自动核。
 LC_GQL = "https://leetcode.cn/graphql/"
@@ -439,7 +488,7 @@ def check_lc_titles(found: dict[str, Path]) -> None:
         notes.append(f"  ↳ 有意偏离：{a}")
 
 
-# ---------------------------------------------------------------- 9 渲染
+# --------------------------------------------------------------- 10 渲染
 def check_render() -> None:
     soffice = shutil.which("libreoffice") or shutil.which("soffice")
     if not soffice or not shutil.which("pdftotext"):
@@ -498,6 +547,7 @@ def main() -> int:
     check_links()
     check_python(found)
     check_regenerate()
+    check_collab()
     if opts.check_oj:
         check_oj_titles(found)
     if opts.check_lc:
