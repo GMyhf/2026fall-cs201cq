@@ -24,7 +24,7 @@
 | T-010 | Q-5：讲义⇄课件口径一致是否自动化 | Done | Claude | `f8c57f9` — 量过三组数据后只做 META 教学要求一段；查出并修复 W05 一处真漂移 |
 | T-011 | 闸门自身失败路径的回归测试 `tools/test_gate.py` | Done | Claude | `fc22a46` → `acea527` — 15 项；累计回归验证 8/8；Codex `5238e07` 复核接受 |
 | T-012 | 协作账目一致性检查（看板格式 + 别处引用的 T-编号是否都在看板上） | Done | Claude | `71cd66f` — 重复 T-ID 报错；合法、悬空、多列、非法状态、重复 ID 五类回归齐备，Codex 复核接受 |
-| T-013 | 渲染闸门增加中文字体嵌入检测 | Review | Claude | `71cd66f` — 已识别 Noto 新命名并补回归；Codex 复核仍发现 `URWGothic-Book` / `ITCAvantGardeGothic` 被误判为 CJK |
+| T-013 | 渲染闸门增加中文字体嵌入检测 | Done | Claude | `1917284` — 纯包含式规则及 43 CJK / 35 拉丁字体语料；Codex 复核接受，macOS LibreOffice 实际拒绝 16 份未嵌入 CJK 的 PDF |
 
 ## 未决 / 待人拍板
 
