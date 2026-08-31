@@ -81,24 +81,61 @@ def resolve_range(opts):
 
 def collect(opts):
     rng, mode = resolve_range(opts)
-    diff_args = ["diff", "HEAD"] if mode == "worktree" else ["diff", rng]
-    data = {
-        "range": rng,
-        "mode": mode,
-        "diff_args": diff_args,
-        "branch": git(["rev-parse", "--abbrev-ref", "HEAD"], soft=True),
-        "head_sha": git(["rev-parse", "--short", "HEAD"], soft=True),
-        "stat": git([*diff_args, "--stat"], soft=True),
-        "name_status": git([*diff_args, "--name-status"], soft=True),
-        "untracked": git(["ls-files", "--others", "--exclude-standard"], soft=True),
-        "log": git(["log", "--oneline", "--no-decorate", rng], soft=True) if mode == "range" else "",
-    }
+    data = {"range": rng, "mode": mode}
+    data["branch"] = git(["rev-parse", "--abbrev-ref", "HEAD"], soft=True)
+    data["head_sha"] = git(["rev-parse", "--short", "HEAD"], soft=True)
+
+    if mode == "worktree":
+        base_args = ["diff", "-M"]
+        data["log"] = ""
+    else:
+        base_args = ["diff", "-M", rng]
+        data["log"] = git(["log", "--oneline", rng], soft=True)
+
+    data["status"] = git([*base_args, "--name-status"], soft=True)
+    data["stat"] = git([*base_args, "--stat"], soft=True)
+    data["untracked"] = git(["ls-files", "--others", "--exclude-standard"], soft=True)
+
+    # 新增文件的 diff 就是文件本身。内容仓库里这部分能到几十万字节，
+    # 内联进来只会被截断成半份；改成给一份带行数的清单，让审查方直接读工作区。
+    added, changed = [], []
+    for line in data["status"].splitlines():
+        parts = line.split("\t")
+        if len(parts) < 2:
+            continue
+        code, path = parts[0], parts[-1]
+        (added if code.startswith("A") else changed).append(path)
+    data["added"] = added
+    data["changed"] = changed
+
+    # 内联 diff 只保留「修改/重命名/删除」，并排除生成物 .pptx（二进制，看字节没意义）
+    diff_args = [*base_args, "--diff-filter=MRCD", "--", ".", ":(exclude)*.pptx"]
     diff = git(diff_args, soft=True)
+    data["diff_args"] = [*base_args, "--diff-filter=MRCD"]
     data["truncated"] = len(diff.encode()) > MAX_DIFF_BYTES
     if data["truncated"]:
         diff = diff.encode()[:MAX_DIFF_BYTES].decode(errors="replace")
     data["diff"] = diff
     return data
+
+
+def added_manifest(paths):
+    """新增文件清单：文本给行数，二进制给体积。"""
+    rows = []
+    for path in paths:
+        f = ROOT / path
+        if not f.is_file():
+            rows.append((path, "已删除或未生成"))
+            continue
+        if f.suffix in {".pptx", ".pdf", ".png", ".docx"}:
+            rows.append((path, f"{f.stat().st_size // 1024} KB（二进制）"))
+        else:
+            try:
+                rows.append((path, f"{len(f.read_text(encoding='utf-8').splitlines())} 行"))
+            except UnicodeDecodeError:
+                rows.append((path, f"{f.stat().st_size // 1024} KB"))
+    width = max((len(r[0]) for r in rows), default=0)
+    return "\n".join(f"{p.ljust(width)}  {info}" for p, info in rows)
 
 
 def read_notes(who):
@@ -151,7 +188,7 @@ def build(opts, data, verify_result):
     ]
     if data["truncated"]:
         lines.append(
-            f"- ⚠️ diff 超过 {MAX_DIFF_BYTES} 字节已截断，完整改动请用 `git {' '.join(data['diff_args'])}` 查看"
+            f"- ⚠️ 内联 diff 超过 {MAX_DIFF_BYTES} 字节已截断，完整改动请用 `git {' '.join(data['diff_args'])}` 查看"
         )
     lines.append("")
 
@@ -161,7 +198,7 @@ def build(opts, data, verify_result):
     if data["log"]:
         lines += ["## 本区间提交", "", "```", data["log"], "```", ""]
 
-    lines += ["## 改动文件", "", "```", data["name_status"] or "(无跟踪改动)", "```"]
+    lines += ["## 改动文件", "", "```", data["status"] or "(无跟踪改动)", "```"]
     if data["untracked"]:
         lines += ["", "未跟踪(新增未 add)文件：", "```", data["untracked"], "```"]
     lines.append("")
@@ -177,7 +214,28 @@ def build(opts, data, verify_result):
         ok, out = verify_result
         lines += [f"## 验证结果：{'✅ 通过' if ok else '❌ 失败'}", "", "```", out, "```", ""]
 
-    lines += ["## 完整 Diff", "", "```diff", data["diff"] or "(空)", "```", "", CHECKLIST, ""]
+    if data["added"]:
+        lines += [
+            "## 新增文件（请直接读工作区，不内联）",
+            "",
+            "> 新增文件的 diff 就是文件本身，内联会把这个包撑到几十万字节。"
+            "以下是清单，审查时直接打开对应文件。",
+            "",
+            "```",
+            added_manifest(data["added"]),
+            "```",
+            "",
+        ]
+    lines += [
+        "## 改动 Diff（仅修改/重命名/删除，已排除生成的 .pptx）",
+        "",
+        "```diff",
+        data["diff"] or "(无此类改动)",
+        "```",
+        "",
+        CHECKLIST,
+        "",
+    ]
     return "\n".join(lines)
 
 
