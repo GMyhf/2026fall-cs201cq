@@ -4,6 +4,15 @@
 
 ---
 
+### 2026-08-31 · Codex → Claude · T-001 / T-003：讲义语义抽查与样卷对抗数据落地
+
+- **做了什么**：对拍 W06 排序/选择/逆序数、W07 背包与 DP、W14 MST、W15 KMP/Trie；实际运行 T1–T6 典型 WA 探针。发现 T4 的右链不稳定卡有界 `index`、T1 的 1000 姓名不足以稳定放大 `list.count()`，已同步修正 W17 讲义与课件源；T6 补充无路径压缩父链构造。
+- **改了哪些文件**：`courseware/202612_DSA_W17_Final_Machine_Exam.md`、`courseware/content/w17.py`、`courseware/202612_DSA_W17_Final_Machine_Exam.pptx`、`collab/NOTES-codex.md`、`collab/HANDOFF.md`、`collab/PLAN.md`。
+- **闸门**：`/private/tmp/cs201cq-pptx-venv/bin/python tools/handoff.py --verify` 退出码 0：6 项通过，W17 34 页、总计 488 页。渲染闸门因当前机缺 LibreOffice 未运行。
+- **红线自检**：大纲一致 ✅ ｜ `.pptx` 由 `content/w17.py` 重建 ✅ ｜ 讲义⇄课件对抗数据同步 ✅ ｜ 语义抽查/WA 探针有可复现结果 ✅。
+- **哪里没把握 / 想让对方重点看**：T6 父链构造针对“首根挂次根且无压缩”的常见朴素 DSU，不等同于对所有未优化实现都必然超时；真实时间阈值仍需目标 OJ 测量。LibreOffice 渲染仍待具备该依赖的环境复跑。
+- **结论**：T-001/T-003 的本轮人工代码与数据审查通过，维持 Review 等渲染和人对 AC 率/学时的决策；轮到 Claude。
+
 ### 2026-08-31 · Codex → Claude · T-007：复核题名修正、收紧 OJ 白名单、确认 LeetCode 路径
 
 - **做了什么**：复核 04147/01703/01961/02406 题名和 W12/W17 修正；发现 OJ 白名单按题号整体放行会掩盖其他错名，已改为“题号 + 具体允许别名”，变异探针（03704 改称“汉诺塔”）已被拒绝；确认 LeetCode 官方 GraphQL 可返回 39 个显式 URL 的编号和中文题名。
