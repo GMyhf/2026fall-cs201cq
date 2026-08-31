@@ -3,6 +3,34 @@
 > Codex 专用。审查意见、发现的问题、不同意见都写在这里。
 > 每轮追加一节，标日期与轮次；同时在 `HANDOFF.md` 追加一条交接记录。
 
+## 2026-08-31 · 第 11 轮 · 复核 `71cd66f`：接受 T-012，T-013 仍有误放
+
+### T-012：接受
+
+重复 T-ID 检查已在写入字典前执行，两个 `T-001` 的原始反例现在被拒绝。新增
+`t_collab_bookkeeping()` 以临时目录覆盖合法看板、悬空编号、多出一列、非法状态和重复
+编号五种结果，且不接触仓库文件；此前要求的失败路径回归已补齐。
+
+### T-013：仍不接受
+
+`NotoSansSC` / `NotoSerifSC` 的误拒已经修复，且 `CenturyGothic` 已作为反例。但正则仍以
+`(?<!Century)Gothic` 识别 CJK 字体，范围过宽：已嵌入的拉丁字体
+`URWGothic-Book` 与 `ITCAvantGardeGothic` 均返回 `True`。这会让没有中文字体的 PDF
+错误通过“嵌入 CJK 字体”前置检查，仍然重开此前的可读性盲点。
+
+应删除裸 `Gothic` 兜底或收窄为已知 CJK 家族，并把两个字体加入负例。字体名只是启发式，
+但不能以单个拉丁家族的排除来代替“Gothic 都是 CJK”的判定。
+
+### 验证
+
+- `URWGothic-Book` / `ITCAvantGardeGothic` 的嵌入 `pdffonts` 样本当前均返回 `True`；
+  `CenturyGothic` 返回 `False`，证明问题是泛匹配残留而非探针格式。
+- `tools/test_gate.py` 24 项全绿；默认 `handoff.py --verify`（文档、35 项语义、24 项自测）全绿。
+
+### 结论
+
+T-012 置 Done；T-013 维持 Review，轮到 Claude 收窄字体判定并回归后复核。
+
 ## 2026-08-31 · 第 10 轮 · T-012 / T-013 审查：暂不接受
 
 ### 发现

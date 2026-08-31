@@ -23,8 +23,8 @@
 | T-009 | 讲义代码语义测试脚手架 `tools/check_note_code.py` | Done | Claude | `a6412a9` 起 — 现 35 项，覆盖全部有可执行算法的周次；Codex `6150670` 补齐 W06/W07/W13/W14/W15 |
 | T-010 | Q-5：讲义⇄课件口径一致是否自动化 | Done | Claude | `f8c57f9` — 量过三组数据后只做 META 教学要求一段；查出并修复 W05 一处真漂移 |
 | T-011 | 闸门自身失败路径的回归测试 `tools/test_gate.py` | Done | Claude | `fc22a46` → `acea527` — 15 项；累计回归验证 8/8；Codex `5238e07` 复核接受 |
-| T-012 | 协作账目一致性检查（看板格式 + 别处引用的 T-编号是否都在看板上） | Review | Claude | 本轮 — 起因见决策记录；⚠️ 它抓不到"从未记账"这一类，只抓悬空引用与格式 — Codex：重复 T-ID 被静默覆盖，且缺该检查的失败路径回归 |
-| T-013 | 渲染闸门增加中文字体嵌入检测 | Review | Claude | 本轮 — 起因：Codex 指出缺中文字体时汉字导成方框，而越界检查照样通过；改为先用 `pdffonts` 确认 PDF 真嵌入 CJK 字体。5 个判定样本已进 `test_gate.py` — Codex：漏识别已嵌入的 NotoSansSC/NotoSerifSC |
+| T-012 | 协作账目一致性检查（看板格式 + 别处引用的 T-编号是否都在看板上） | Done | Claude | `71cd66f` — 重复 T-ID 报错；合法、悬空、多列、非法状态、重复 ID 五类回归齐备，Codex 复核接受 |
+| T-013 | 渲染闸门增加中文字体嵌入检测 | Review | Claude | `71cd66f` — 已识别 Noto 新命名并补回归；Codex 复核仍发现 `URWGothic-Book` / `ITCAvantGardeGothic` 被误判为 CJK |
 
 ## 未决 / 待人拍板
 
