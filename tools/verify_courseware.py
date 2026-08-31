@@ -136,7 +136,30 @@ def check_syllabus(found: dict[str, Path]) -> None:
             fail("大纲", f"第 {wk} 周教学要求与大纲不一致\n"
                          f"        大纲: {want_req}\n"
                          f"        讲义: {got_req.group(1)}")
-    notes.append(f"大纲：{len(rows)} 周教学内容/要求与 docx 逐字一致")
+    # 课件 META 的 info 里也原样复述了教学要求 —— 这是讲义⇄课件之间
+    # 唯一"逐字可比"的一段（其余是散文，比对只会制造噪声，见 PLAN Q-5）。
+    # 允许在其后追加内容（W17 追加了占比与读者说明），但**开头必须是大纲原文**。
+    drift = 0
+    import importlib.util
+    for wk in WEEKS:
+        mod_path = CW / "content" / f"w{wk}.py"
+        if not mod_path.is_file():
+            continue
+        spec = importlib.util.spec_from_file_location(f"_w{wk}", mod_path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        info = " ".join(getattr(mod, "META", {}).get("info", []))
+        m = re.search(r"教学要求[：:](.+)", info)
+        if not m:
+            fail("大纲", f"content/w{wk}.py 的 META.info 里没有教学要求")
+            continue
+        if not norm(m.group(1)).startswith(norm(rows[wk][1])):
+            drift += 1
+            fail("大纲", f"第 {wk} 周课件 META 的教学要求与大纲不符\n"
+                         f"        大纲: {rows[wk][1]}\n"
+                         f"        课件: {m.group(1)}")
+    notes.append(f"大纲：{len(rows)} 周教学内容/要求与 docx 逐字一致，"
+                 f"16 份课件 META 的教学要求同源（不符 {drift} 处）")
 
 
 # ---------------------------------------------------------------- 4 链接
