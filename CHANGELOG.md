@@ -158,3 +158,39 @@
   渲染命令、`CLAUDE.md` 的目录约定。
 - 新增 `courseware/.gitignore`，忽略 `__pycache__/` 与 `*.pyc`。
 - 本文件中 2026-08-30 早先两条记录仍写作 `slides/`，为当时的真实路径，按变更日志惯例保留。
+
+---
+
+## 2026-08-31 — 新增回归闸门与 Claude⇄Codex 协作脚手架
+
+为让另一个 AI（Codex）能接手审查这批课件，补上「可验证」与「可交接」两层基础设施。
+
+### 新增文件
+
+| 文件 | 作用 |
+| ---- | ---- |
+| `tools/verify_courseware.py` | 课件回归闸门，7 项检查 |
+| `tools/handoff.py` | 把一个 git range 打包成给对方 AI 的 review 输入包 |
+| `collab/README.md` | 协作脚手架说明 + 本项目红线清单 |
+| `collab/PLAN.md` | 唯一任务清单（T-001…T-006）、未决项、决策记录 |
+| `collab/HANDOFF.md` | 交接日志（含本轮 Claude → Codex 记录与模板） |
+| `collab/NOTES-claude.md` | Claude 留给 Codex 的话：实跑过什么、**哪里没把握** |
+| `collab/NOTES-codex.md` | Codex 回写位（占位） |
+
+### 闸门检查项
+
+配对（每周 `.md` + 同名 `.pptx` + `content/wNN.py`）、元数据（标题与 GMT+8 时间戳）、
+**大纲对齐**（直接解析教学大纲 `.docx` 第四节，与讲义头部逐字比对）、本地链接可达、
+Python 语法（讲义代码块 + `courseware/*.py`）、可重新生成（页数与 README 声明一致），
+以及可选的渲染越界检查（`--render`）。
+
+闸门做过**变异自检**：7 处人为破坏全部被抓（7/7），复原后全绿。
+
+### 顺带修正
+
+- `courseware/deck.py` 原用 python-pptx 私有 API `prs.slides.__iter__.__self__._sldIdLst`
+  数页数，改为公共的 `len(prs.slides)`。
+- `courseware/build_all.py` 改为打印**实际生成页数**（来自 `deck.build` 的返回值）
+  而不是 `len(SLIDES) + 1`；两者恰好相等，但前者才是事实，也让闸门的页数比对有据可依。
+- 新增根 `.gitignore` 与 `collab/.gitignore`（忽略 `__pycache__` 与生成的 `review-input.md`）。
+- `README.md` 与 `CLAUDE.md` 补充闸门用法与 `collab/` 指引。

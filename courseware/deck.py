@@ -464,4 +464,4 @@ def build(meta, slides, out_path):
         if kind != 'section':
             _footer(slide, meta.get('footer', ''), i)
     prs.save(out_path)
-    return len(prs.slides.__iter__.__self__._sldIdLst)
+    return len(prs.slides)

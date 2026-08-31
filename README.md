@@ -1,6 +1,6 @@
 # 2026fall-cs201cq: DS Algo（数据结构与算法）
 
-*Updated 2026-08-30 17:05 GMT+8*  
+*Updated 2026-08-31 02:30 GMT+8*  
  *Compiled by Hongfei Yan (2026 Fall)*  
 *项目仓库：[GMyhf/2026fall-cs201cq](https://github.com/GMyhf/2026fall-cs201cq/)*
 
@@ -60,6 +60,17 @@
 pip install python-pptx
 cd courseware && python3 build_all.py        # 重新生成全部课件
 ```
+
+### 校验与协作
+
+课件材料有一套回归闸门，改动 `courseware/` 后请跑一遍：
+
+```bash
+python3 tools/verify_courseware.py            # 配对/元数据/大纲对齐/链接/语法/可重生成
+python3 tools/verify_courseware.py --render   # 追加：渲染 488 页并检查排版越界
+```
+
+多 AI 协作（Claude ⇄ Codex）的任务清单、交接日志与审查约定见 **[`collab/`](collab/)**。
 
 ### 考核方式
 

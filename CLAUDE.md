@@ -31,6 +31,12 @@ instead. Root level holds the 2026 spring (`202603_`–`202606_`) notes; the 202
 - `cheatsheet/` — student-contributed final-exam cheat sheets (`.md`, `.pdf`, `.docx`), named `<TOPIC>_<STUDENTNAME>`.
 - `20260609_ExamPreptoFrontierAI/` — courseware/notes from a talk (mixed `.md`, `.pdf`, `.pptx`, `.png`, `.html`).
 - `game_*.py` — standalone pygame programs (`game_Sudoku.py`, `game_Minesweeper.py`, `game_PokerMachine.py`); each is self-contained.
+- `tools/` — `verify_courseware.py` is the regression gate for the fall courseware (pairing,
+  metadata, syllabus alignment, links, Python syntax, regenerability, optional render check);
+  `handoff.py` packages a git range into a review bundle for the other AI.
+- `collab/` — Claude ⇄ Codex collaboration scaffold: `PLAN.md` (single task list + decision log),
+  `HANDOFF.md` (handoff log), `NOTES-claude.md` / `NOTES-codex.md`. Read `collab/README.md` before
+  picking up work here. `collab/review-input.md` is generated and not tracked.
 - `README.md` — course syllabus, schedule, grading rules, and links (the authoritative course overview).
 
 ## Markdown note conventions
@@ -48,6 +54,20 @@ When you make a substantive edit to a note, bump the `*Updated ...*` timestamp (
 Beijing). Homework files carry an additional grading-rubric table near the top — leave its structure
 unchanged. Images are referenced by absolute `raw.githubusercontent.com/GMyhf/img/...` URLs, not
 local paths; do not rewrite these to relative links.
+
+## Verifying courseware changes
+
+There is no test suite, but the fall courseware has a regression gate — run it before handing work
+off, and always after touching `courseware/`:
+
+```bash
+python3 tools/verify_courseware.py            # pairing, metadata, syllabus, links, syntax, rebuild
+python3 tools/verify_courseware.py --render   # + render all 488 slides and check for overflow
+```
+
+The syllabus `.docx` is the source of truth for each week's 教学内容 / 教学要求; the gate compares
+the notes against it verbatim. **Changing `courseware/deck.py` requires re-running with `--render`** —
+layout overflow is only visible in a real render.
 
 ## Running the games
 

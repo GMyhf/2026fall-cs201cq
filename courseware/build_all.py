@@ -42,8 +42,8 @@ def main(argv):
     for wk in wanted:
         mod = importlib.import_module(f'w{wk}')
         out = HERE / (WEEKS[wk] + '.pptx')
-        deck.build(mod.META, mod.SLIDES, str(out))
-        print(f"{out.name}  ({len(mod.SLIDES) + 1} slides)")
+        pages = deck.build(mod.META, mod.SLIDES, str(out))
+        print(f"{out.name}  ({pages} slides)")
 
 
 if __name__ == '__main__':
