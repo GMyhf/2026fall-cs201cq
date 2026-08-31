@@ -22,8 +22,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS: list[tuple[bool, str, str]] = []
-_ORIG_SLEEP = time.sleep          # 供泄漏检测用例比对
-_ORIG_RUN = subprocess.run
+
 
 
 def fresh():
@@ -133,27 +132,95 @@ def t_positive_control():
     expect("正常输入下大纲/链接零失败", not vc.failures, str(vc.failures))
 
 
-def t_no_global_patch_leaks():
-    """所有用例跑完后，被临时替换过的全局函数必须已还原。
+# ---------------------------------------------------------------- LC 侧
+def _lc_corpus(tmp: Path, text: str):
+    """造一份只含指定引用的合成语料，并把模块的 CW 指过去。
 
-    这条是给测试文件自己用的。前面的用例会桩 `subprocess.run` /
-    `shutil.which` / `time.sleep`；只要有一处忘了还原，进程内后续行为就被污染，
-    而且不会有任何报错——正是这条断言要拦的。
+    `check_lc_titles` 会扫 `found` 里的讲义与 `CW/content/*.py`；
+    指向空的临时 content 目录，就能精确控制被检查的内容。
     """
-    expect("shutil.which 未被污染",
-           shutil.which("definitely-not-a-real-binary-xyz") is None)
-    expect("time.sleep 已还原", time.sleep is _ORIG_SLEEP)
-    expect("subprocess.run 已还原", subprocess.run is _ORIG_RUN)
+    (tmp / "content").mkdir(parents=True, exist_ok=True)
+    md = tmp / "fake.md"
+    md.write_text(text, encoding="utf-8")
+    return {"99": md}
+
+
+def t_lc_per_occurrence_not_masked():
+    """同一 slug 在别处被正确引用，不得掩盖这一处的错号。
+
+    这正是 Claude 第 4 轮栽过的跟头：按 slug 汇总各处题号再比对，
+    house-robber 在别处的正确号 198 把误标成 70 的那一处放过去了。
+    """
+    import tempfile
+    vc = fresh()
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        found = _lc_corpus(tmp,
+            "**LeetCode 198. 打家劫舍**，https://leetcode.cn/problems/house-robber/\n"
+            "**LeetCode 70**，https://leetcode.cn/problems/house-robber/\n")
+        with patched((vc, "CW", tmp), (time, "sleep", lambda *_: None)):
+            vc._lc_meta = lambda slug: ("198", "打家劫舍")
+            vc.check_lc_titles(found)
+    expect("LC 逐处比对：错号不被同 slug 的正确引用掩盖",
+           any("标成 70" in f for f in vc.failures), str(vc.failures))
+
+
+def t_lc_allowlist_is_per_alias():
+    """LC 白名单同样必须"按别名"放行，不能按题号整体豁免。"""
+    import tempfile
+
+    def run(allow):
+        vc = fresh()
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            found = _lc_corpus(tmp,
+                "**LeetCode 198. 打劫民宅**，https://leetcode.cn/problems/house-robber/\n")
+            vc.LC_TITLE_ALLOW = allow
+            with patched((vc, "CW", tmp), (time, "sleep", lambda *_: None)):
+                vc._lc_meta = lambda slug: ("198", "打家劫舍")
+                vc.check_lc_titles(found)
+        return [f for f in vc.failures if "198" in f]
+
+    expect("LC 无白名单时题名不符会失败", run({}), "空白名单下应当失败")
+    expect("LC 登记了正确别名则放行",
+           not run({"198": {"打劫民宅": "教学用简称"}}), "登记别名后不该失败")
+    expect("LC 登记了别的别名仍拒绝",
+           run({"198": {"无关别名": "无关理由"}}), "换个别名就该继续失败")
+
+
+GLOBAL_WATCH = ((shutil, "which"), (time, "sleep"), (subprocess, "run"))
+
+
+def snapshot():
+    return {(id(o), a): getattr(o, a) for o, a in GLOBAL_WATCH}
 
 
 def main():
-    for fn in (t_missing_week_does_not_crash, t_deck_meta_drift_caught,
-               t_render_failure_reports_exit_code, t_oj_allowlist_is_per_alias,
-               t_positive_control, t_no_global_patch_leaks):
+    cases = (t_missing_week_does_not_crash, t_deck_meta_drift_caught,
+             t_render_failure_reports_exit_code, t_oj_allowlist_is_per_alias,
+             t_lc_per_occurrence_not_masked, t_lc_allowlist_is_per_alias,
+             t_positive_control)
+    # 泄漏检查逐用例执行，而不是只在最后跑一次。
+    # 只在最后查，既依赖用例顺序（有人往后插一个用例就失效），
+    # 也说不出是哪个用例漏的 —— Codex 的建议。
+    baseline = snapshot()
+    leaked = 0
+    for fn in cases:
         try:
             fn()
         except Exception as e:
             expect(fn.__name__, False, f"用例自身出错 {type(e).__name__}: {e}")
+        after = snapshot()
+        bad = [a for (_, a), v in after.items() if v is not baseline[(_, a)]]
+        if bad:
+            leaked += 1
+            expect(f"{fn.__name__} 未泄漏全局补丁", False,
+                   f"未还原：{', '.join(sorted(bad))}")
+            for o, a in GLOBAL_WATCH:      # 复原后继续，避免污染后续用例
+                setattr(o, a, baseline[(id(o), a)])
+    if not leaked:
+        expect(f"逐用例检查：{len(cases)} 个用例均未泄漏全局补丁", True)
+
     print("── test_gate · 闸门失败路径 ──")
     bad = 0
     for ok, name, detail in RESULTS:
