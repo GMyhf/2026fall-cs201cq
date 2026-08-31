@@ -500,18 +500,27 @@ def check_lc_titles(found: dict[str, Path]) -> None:
 # 这里改从产物判断：PDF 必须真嵌入了带 CJK 的字体。
 # ⚠️ 局限：靠字体名判断覆盖范围并不严格（名字像 CJK 不等于字全）；
 # 但"一个 CJK 字体都没嵌"是字体替换的强证据，足以拒绝签发"渲染通过"。
-# 字体名清单。Codex 发现原表漏了 Noto 的新命名 —— Google 已把 NotoSansCJKsc
-# 拆成 NotoSansSC/TC/HK/JP/KR，装了新版 Noto 的机器会被误判成"没有中文字体"，
-# 可读的 PDF 反而被拒签。误拒比漏判更糟：它挡住的是本来正确的交付。
-# `Gothic` 要排除 Century Gothic（拉丁字体），否则会反向误判为有中文。
+# 字体名清单。两轮下来的教训：**排除式清单是错的形状**。
+# 先前写 `Gothic` 再用 `(?<!Century)` 排除，结果 Codex 指出 URWGothic-Book /
+# ITCAvantGardeGothic 仍被误判；铺开语料后发现 FranklinGothic、NewsGothic、
+# TradeGothic、LetterGothic、CopperplateGothic 也都中招 —— Gothic 本就是西文
+# "无衬线"的通称，裸词永远排不干净。
+# 现在只认**带 CJK 限定词的组合**，不留 Gothic / Ming / Song / Hei / Kai 这类裸词。
+# 局限仍在（名字像 ≠ 字全），它只是可读性的兜底信号；权威判断是人工逐页复看（T-002）。
 CJK_FONT = re.compile(
     r"CJK"
     r"|SourceHan|Han(Sans|Serif|Mono)"
     r"|Noto(Sans|Serif)(Mono)?(SC|TC|HK|JP|KR)"
-    r"|Hei(ti)?|Song(ti)?|Ming(Liu)?|(?<!Century)Gothic|Kai(Ti)?|FangSong"
-    r"|YaHei|JhengHei|SimSun|SimHei|NSimSun|PingFang|MSung|MHei"
-    r"|ST(Song|Heiti|Kaiti|Fangsong)|WenQuanYi|Droid ?Sans ?Fallback"
-    r"|Hira(Kaku|Min)|Meiryo|Malgun|Batang|Dotum|Gulim|Nanum",
+    # 日文 Gothic 必须带已知前缀，避免命中西文的各种 *Gothic
+    r"|(MS|Yu|IPA|Takao|VL|Sazanami|Kochi|BIZ ?UD|Hiragino|Kaku)[ _-]?P?(UI)?[ _-]?Gothic"
+    r"|Mincho|MingLiU|PMingLiU|AR ?PL"
+    r"|SongTi|SongStd|AdobeSong|SimSun|NSimSun|STSong"
+    r"|HeiTi|SimHei|STHeiti|MHei|AdobeHei"
+    r"|KaiTi|STKaiti|AdobeKai|BiauKai|DFKai"
+    r"|FangSong|STFangsong"
+    r"|YaHei|JhengHei|PingFang|MSung"
+    r"|WenQuanYi|Droid ?Sans ?Fallback"
+    r"|Hira(Kaku|Min|gino)|Meiryo|Malgun|Batang|Dotum|Gulim|Nanum",
     re.I)
 
 

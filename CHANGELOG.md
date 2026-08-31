@@ -404,3 +404,20 @@ Codex 打回 T-012 / T-013，两条均成立：
   共 5 条，用临时目录造合成看板，不触碰真实文件。
 
 `tools/test_gate.py` 现 24 项；回归验证 2/2（回退字体表与重复检测，对应断言均变红）。
+
+---
+
+## 2026-08-31（续 12）— CJK 字体判定改为纯包含式
+
+Codex 指出 `URWGothic-Book`、`ITCAvantGardeGothic` 被误判为中文字体。铺开语料后
+中招的共 **7 个**西文 Gothic（另有 FranklinGothic、NewsGothic、TradeGothic、
+LetterGothic、CopperplateGothic）。
+
+根因是清单形状：上一版保留裸词 `Gothic` 再用 `(?<!Century)` 逐个排除——而 Gothic
+本就是西文"无衬线"的通称，排除式清单永远排不干净。现改为**纯包含式**，只认带 CJK
+限定词的组合，日文 Gothic 必须带已知前缀，不再保留 Gothic / Ming / Song / Hei / Kai
+等裸词。
+
+语料铺开至 **78 个**并固化进 `tools/test_gate.py`：43 个中文字体（简/繁/日/韩各家族）
+漏判 0，35 个拉丁字体（含 7 个 *Gothic 陷阱）误判 0。回归验证：回退为上一版规则时，
+"拉丁字体均不误判"一条立刻变红。

@@ -164,20 +164,39 @@ def t_cjk_font_detection():
     hdr = ("name  type  encoding  emb sub uni object ID\n"
            "---   ---   ---       --- --- --- ---\n")
     row = "ABCDEF+{}  TrueType  Identity-H  yes yes yes 10 0"
-    # Codex 发现原表漏了 Noto 新命名（NotoSansCJKsc 已拆成 NotoSansSC/TC/…），
-    # 可读 PDF 会被误拒。误拒比漏判更糟，所以正例样本按家族铺开。
-    yes_fonts = ["NotoSansCJKsc-Bold", "NotoSansSC-Regular", "NotoSerifSC-Bold",
-                 "NotoSansTC-Regular", "NotoSansMonoCJKsc-Regular", "SourceHanSansSC",
-                 "MicrosoftYaHei", "SimSun", "PingFangSC-Regular", "STSong",
-                 "WenQuanYiMicroHei", "DroidSansFallback", "MSGothic", "HiraKakuProN"]
-    # 反例里特意放了 CenturyGothic —— 名字含 Gothic 但是拉丁字体
-    no_fonts = ["NotoSans-Bold", "DejaVuSansMono", "Helvetica", "TimesNewRoman",
-                "CenturyGothic", "Arial", "NotoColorEmoji"]
-    miss = [f for f in yes_fonts if not vc.has_cjk_font(hdr + row.format(f))]
-    false_pos = [f for f in no_fonts if vc.has_cjk_font(hdr + row.format(f))]
-    expect(f"CJK 字体判定：{len(yes_fonts)} 个中文字体全部识别", not miss, f"漏判：{miss}")
-    expect(f"CJK 字体判定：{len(no_fonts)} 个拉丁字体均不误判", not false_pos,
-           f"误判：{false_pos}")
+    # 语料要铺开。两轮都栽在"只想到自己举得出的那几个"上：
+    # 第一轮漏了 Noto 新命名（误拒可读 PDF），第二轮 `(?<!Century)Gothic`
+    # 只排掉了我想到的那一个，URW / AvantGarde / Franklin / News / Trade /
+    # Letter / Copperplate 一堆西文 *Gothic 照样被判成中文（误放）。
+    cjk_fonts = [
+        "NotoSansCJKsc-Bold", "NotoSansSC-Regular", "NotoSerifSC-Bold",
+        "NotoSansTC-Regular", "NotoSansMonoCJKsc-Regular", "SourceHanSansSC",
+        "SourceHanSerifCN", "MicrosoftYaHei", "MicrosoftJhengHei", "SimSun",
+        "NSimSun", "SimHei", "KaiTi", "FangSong", "PingFangSC-Regular",
+        "STSong", "STHeiti", "STKaiti", "WenQuanYiMicroHei", "DroidSansFallback",
+        "MSGothic", "MSPGothic", "MSUIGothic", "YuGothic", "IPAGothic",
+        "TakaoPGothic", "VLGothic", "BIZUDGothic", "HiraKakuProN-W3",
+        "HiraginoSans", "HiraMinProN", "Meiryo", "MalgunGothic", "Batang",
+        "Dotum", "Gulim", "NanumGothic", "MingLiU", "PMingLiU", "MSMincho",
+        "ARPLUMingCN", "BiauKai", "DFKaiShu",
+    ]
+    latin_fonts = [
+        # 前 7 个是西文里带 Gothic 的陷阱：Gothic 本就是西文"无衬线"的通称
+        "URWGothic-Book", "ITCAvantGardeGothic", "FranklinGothicBook",
+        "NewsGothicMT", "TradeGothic", "LetterGothic", "CopperplateGothic",
+        "CenturyGothic", "Helvetica", "Arial", "TimesNewRoman", "DejaVuSans",
+        "DejaVuSansMono", "NotoSans-Bold", "NotoSerif-Regular", "Calibri",
+        "Cambria", "Georgia", "Verdana", "Courier", "NimbusRomNo9L",
+        "URWBookman", "Palatino", "Garamond", "Baskerville", "Optima",
+        "Futura", "GillSans", "Univers", "Frutiger", "MinionPro", "MyriadPro",
+        "SegoeUI", "Consolas", "NotoColorEmoji",
+    ]
+    miss = [f for f in cjk_fonts if not vc.has_cjk_font(hdr + row.format(f))]
+    false_pos = [f for f in latin_fonts if vc.has_cjk_font(hdr + row.format(f))]
+    expect(f"CJK 字体判定：{len(cjk_fonts)} 个中文字体全部识别（无误拒）",
+           not miss, f"漏判：{miss}")
+    expect(f"CJK 字体判定：{len(latin_fonts)} 个拉丁字体均不误判（无误放）",
+           not false_pos, f"误判：{false_pos}")
     expect("CJK 字体判定：有 CJK 但未嵌入 -> 不通过",
            not vc.has_cjk_font(hdr + "B+NotoSansCJKsc-Bold  Type 1  Builtin  no  no  yes 1 0"))
     expect("CJK 字体判定：空输出 -> 不通过", not vc.has_cjk_font(""))

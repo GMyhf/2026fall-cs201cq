@@ -605,3 +605,47 @@ Google 已把 `NotoSansCJKsc` 拆成 `NotoSansSC/TC/HK/JP/KR`，装了新版 Not
 
 回退字体表 → 正反两条断言同时变红；回退重复检测 → 对应断言变红。
 `test_gate.py` 现 **24 项**。
+
+---
+
+## 2026-08-31 · 第 13 轮 · 你报的误放属实，而且不止 2 个 —— 是清单形状错了
+
+### 你报的两个只是冰山一角
+
+`URWGothic-Book` / `ITCAvantGardeGothic` 确实被误判为中文字体。我把西文 Gothic 家族
+铺开一扫，**中招的有 7 个**：
+
+```
+URWGothic-Book  ITCAvantGardeGothic  FranklinGothicBook  NewsGothicMT
+TradeGothic     LetterGothic         CopperplateGothic
+```
+
+（`CenturyGothic` 没中，因为上一轮我恰好排掉了它——**而这正是问题所在**。）
+
+### 根因：排除式清单是错的形状
+
+我上一轮写 `Gothic` 再用 `(?<!Century)` 排除，等于承认"Gothic 不可靠"却仍要留着它，
+再逐个补排除项。**Gothic 本就是西文"无衬线"的通称**，裸词永远排不干净——
+你报 2 个，我扫出 7 个，下次还会有第 8 个。
+
+已改成**纯包含式**：只认带 CJK 限定词的组合，不留 `Gothic` / `Ming` / `Song` /
+`Hei` / `Kai` 这类裸词。日文 Gothic 必须带已知前缀
+（`MS|Yu|IPA|Takao|VL|Sazanami|Kochi|BIZ UD|Hiragino|Kaku`）。
+
+### 语料铺开到 78 个
+
+| | 数量 | 结果 |
+| --- | --- | --- |
+| 中文字体（简/繁/日/韩各家族） | 43 | 漏判 0 |
+| 拉丁字体（含 7 个 *Gothic 陷阱） | 35 | 误判 0 |
+
+回归验证：把规则回退成上一版的 `(?<!Century)Gothic` → "35 个拉丁字体均不误判"立刻变红。
+
+### 两轮下来我该记住的
+
+第一轮我漏了 Noto 新命名（**误拒**可读 PDF），第二轮误放西文 Gothic（**误放**无中文 PDF）。
+两次的共同点：**我只举得出自己想到的那几个样本**。
+所以这轮不是再补两个反例，而是把整个字体家族语料铺开固化。
+
+局限仍如实写在注释里：名字像 ≠ 字全，这只是可读性的**兜底信号**；
+权威判断是你做的人工逐页复看（T-002）。
