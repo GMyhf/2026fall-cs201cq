@@ -11,11 +11,13 @@
   4. 链接     所有本地 .md/.pptx/.py 链接可达
   5. 语法     讲义里的 ```python 代码块、以及 courseware/*.py 全部能被解析
   6. 可重生成 课件能从 content/wNN.py 重新生成，页数与 README 表格声明一致
-  7. 渲染     （可选，需 libreoffice + pdftotext）渲染全部页面，检查文字未越出版心
+  7. OJ题号   （可选，需联网）抓 cs101.openjudge.cn 的题目标题，与讲义里的叫法比对
+  8. 渲染     （可选，需 libreoffice + pdftotext）渲染全部页面，检查文字未越出版心
 
 用法:
-  python3 tools/verify_courseware.py            # 1–6，秒级
-  python3 tools/verify_courseware.py --render   # 加上第 7 项，约 2–4 分钟
+  python3 tools/verify_courseware.py              # 1–6，秒级
+  python3 tools/verify_courseware.py --check-oj   # 加第 7 项，约 30 秒（需联网）
+  python3 tools/verify_courseware.py --render     # 加第 8 项，约 2–4 分钟
 """
 import argparse
 import ast
@@ -224,7 +226,87 @@ def check_regenerate() -> None:
         notes.append(f"可重生成：16 份课件重新生成成功，共 {total} 页，页数与 README 一致")
 
 
-# ---------------------------------------------------------------- 7 渲染
+# ------------------------------------------------------- 7 OJ 题号（需联网）
+# 上一轮我判定"题号↔题名离线检不出来"——对，但那只说明它不能进默认闸门。
+# cs101.openjudge.cn 走明文 HTTP 可达（WebFetch 强制 https 才连不上），
+# 于是把它做成一项显式的联网检查：抓平台标题，与讲义/课件里的叫法比对。
+OJ_URL = "http://cs101.openjudge.cn/practice/{}/"
+OJ_NUM = re.compile(r"OJ\s*(\d{5})")
+OJ_NAMED = [
+    re.compile(r"\*\*OJ (\d{5})[:：]\s*([^*]+?)\*\*"),        # **OJ 03704: 括号匹配问题**
+    re.compile(r"\|\s*([^|]{2,30}?)\s*\|\s*OJ (\d{5})\s*\|"),  # | 括号匹配问题 | OJ 03704 |
+]
+
+
+def _oj_title(num: str) -> str | None:
+    import urllib.error
+    import urllib.request
+    try:
+        with urllib.request.urlopen(OJ_URL.format(num), timeout=20) as r:
+            body = r.read().decode("utf-8", "replace")
+    except (urllib.error.URLError, OSError):
+        return None
+    m = re.search(r"<title>([^<]*)</title>", body)
+    if not m:
+        return None
+    t = m.group(1).replace("OpenJudge - ", "").strip()
+    return t.split(":", 1)[1].strip() if ":" in t else t
+
+
+# 有意偏离平台标题的，登记在这里并写明理由——不写理由不许加
+OJ_TITLE_ALLOW = {
+    "03704": "平台标题把「括号」误写成「扩号」，讲义用正确写法",
+    "27653": "平台写「Fraction类」，讲义按仓库规范在中英文间加空格",
+    "22158": "备选题库表格列宽有限，简称「前中序建树」",
+    "24591": "备选题库表格列宽有限，简称「中序转后序」",
+}
+
+
+def check_oj_titles(found: dict[str, Path]) -> None:
+    import time
+
+    files = sorted(found.values()) + sorted((CW / "content").glob("*.py"))
+    nums, used = set(), {}
+    for f in files:
+        text = f.read_text(encoding="utf-8")
+        nums |= set(OJ_NUM.findall(text))
+        for m in OJ_NAMED[0].finditer(text):
+            used.setdefault(m.group(1), set()).add(m.group(2).strip())
+        for m in OJ_NAMED[1].finditer(text):
+            used.setdefault(m.group(2), set()).add(m.group(1).strip())
+
+    unreachable, mismatched, checked, allowed = [], 0, 0, []
+    for num in sorted(nums):
+        title = _oj_title(num)
+        time.sleep(0.3)                      # 对题库客气一点
+        if title is None:
+            unreachable.append(num)
+            continue
+        checked += 1
+        mine = used.get(num)
+        if not mine:
+            continue                          # 只在正文提过，没有可提取的"号: 名"
+        norm = lambda x: re.sub(r"[\s（(].*$", "", x).strip()
+        # 必须【每一处】叫法都对得上：只要有一处写错就得报。
+        # 早先写成 any() —— 同一个号在别处的正确叫法会把错的那处盖掉，变异自检没抓到。
+        wrong = [m for m in sorted(mine)
+                 if not (norm(m) == norm(title) or norm(title) in m or m in title)]
+        if wrong:
+            if num in OJ_TITLE_ALLOW:
+                allowed.append(f"{num}（{OJ_TITLE_ALLOW[num]}）")
+                continue
+            mismatched += 1
+            fail("OJ题号", f"{num} 平台标题「{title}」，讲义里写作「{' / '.join(wrong)}」")
+    if unreachable:
+        fail("OJ题号", f"{len(unreachable)} 个题号取不到平台标题（网络不通？）：{', '.join(unreachable)}")
+    extra = f"，另有 {len(allowed)} 处已登记的有意偏离" if allowed else ""
+    notes.append(f"OJ题号：{checked}/{len(nums)} 个题号已联网核对平台标题，"
+                 f"不一致 {mismatched} 处{extra}")
+    for a in allowed:
+        notes.append(f"  ↳ 有意偏离：{a}")
+
+
+# ---------------------------------------------------------------- 8 渲染
 def check_render() -> None:
     soffice = shutil.which("libreoffice") or shutil.which("soffice")
     if not soffice or not shutil.which("pdftotext"):
@@ -265,6 +347,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--render", action="store_true", help="附加渲染与排版越界检查（慢）")
+    ap.add_argument("--check-oj", action="store_true",
+                    help="附加 OJ 题号联网核对（需能访问 cs101.openjudge.cn）")
     opts = ap.parse_args()
 
     found = decks()
@@ -274,6 +358,8 @@ def main() -> int:
     check_links()
     check_python(found)
     check_regenerate()
+    if opts.check_oj:
+        check_oj_titles(found)
     if opts.render:
         check_render()
 

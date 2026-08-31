@@ -1,6 +1,6 @@
 # 第15周 散列表、KMP、倒排索引 → RAG
 
-*Updated 2026-08-30 14:20 GMT+8*
+*Updated 2026-08-31 04:20 GMT+8*
  *Compiled by Hongfei Yan (2026 Fall)*
 https://github.com/GMyhf/2026fall-cs201cq
 
@@ -379,7 +379,7 @@ def repeated_substring_pattern(s):
     return nxt[n - 1] > 0 and n % (n - nxt[n - 1]) == 0
 ```
 
-**OJ 相关**：01961 Period、02406 Power Strings（都是求循环节）。
+**OJ 相关**：01961 前缀中的周期、02406 字符串乘方（都是求循环节）。
 
 ## 3.7 字符串哈希（Rabin-Karp）
 
@@ -744,7 +744,7 @@ class MiniRAG:
 | 4 | 最长连续序列 | LC 128 | set 的 O(n) 技巧 |
 | 5 | 找出字符串中第一个匹配项的下标 | LC 28 | KMP |
 | 6 | 重复的子字符串 | LC 459 | next 数组求循环节 |
-| 7 | Power Strings | OJ 02406 | KMP 循环节 |
+| 7 | 字符串乘方 | OJ 02406 | KMP 循环节 |
 | 8 | 实现 Trie（前缀树） | LC 208 | Trie |
 | 9 | 单词搜索 II | LC 212 | Trie + 回溯 |
 | 10（选做） | 实现迷你搜索引擎 | 课堂题 | 倒排索引 + BM25 |

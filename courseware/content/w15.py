@@ -172,7 +172,7 @@ def repeated_substring_pattern(s):     # LC 459
     n = len(s)
     nxt = build_next(s)
     return nxt[n - 1] > 0 and n % (n - nxt[n - 1]) == 0
-''', 'OJ 01961 Period、OJ 02406 Power Strings 都是这个模板'),
+''', 'OJ 01961 前缀中的周期、OJ 02406 字符串乘方 都是这个模板'),
 
     ('code', '另一条路：字符串哈希（Rabin-Karp）', '''MOD = (1 << 61) - 1
 BASE = 131
@@ -379,7 +379,7 @@ class InvertedIndex:
         ['3', '最长连续序列', 'LC 128', 'set 的 O(n) 技巧'],
         ['4', '找出字符串中第一个匹配项的下标', 'LC 28', 'KMP'],
         ['5', '重复的子字符串', 'LC 459', 'next 数组求循环节'],
-        ['6', 'Power Strings', 'OJ 02406', 'KMP 循环节'],
+        ['6', '字符串乘方', 'OJ 02406', 'KMP 循环节'],
         ['7', '实现 Trie / 单词搜索 II', 'LC 208 / 212', 'Trie、Trie + 回溯'],
         ['8（选做）', '实现迷你搜索引擎', '课堂题', '倒排索引 + BM25'],
     ]),

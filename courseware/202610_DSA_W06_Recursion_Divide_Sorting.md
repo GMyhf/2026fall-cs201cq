@@ -1,6 +1,6 @@
 # 第6周 递归与分治；排序算法与性能对比
 
-*Updated 2026-08-31 03:10 GMT+8*
+*Updated 2026-08-31 04:20 GMT+8*
  *Compiled by Hongfei Yan (2026 Fall)*
 https://github.com/GMyhf/2026fall-cs201cq
 
@@ -83,9 +83,11 @@ def fib(n):
 
 ## 1.4 经典例题：汉诺塔
 
-**LC 面试题 08.06 汉诺塔问题**，https://leetcode.cn/problems/hanota-lcci/
+**OJ 04147: 汉诺塔问题(Tower of Hanoi)**，http://cs101.openjudge.cn/practice/04147/
 
-> 把 n 个盘子从 A 借助 B 移到 C，每次只能移一个，大盘不能压在小盘上。
+> 有三根杆子 A、B、C，A 上有 N 个穿孔圆盘，尺寸由下到上依次变小。
+> 按下列规则把所有圆盘移到 C：每次只移一个；大盘不能叠在小盘上面。
+> 另见 LeetCode 面试题 08.06 汉诺塔问题，https://leetcode.cn/problems/hanota-lcci/
 
 ```python
 def hanoi(n, src, aux, dst, moves):
@@ -623,7 +625,7 @@ def sort_colors(nums):
 
 | # | 题目 | 平台 / 编号 | 考点 |
 | - | ---- | ---- | ---- |
-| 1 | 汉诺塔问题 | LC 面试题 08.06 | 递归 |
+| 1 | 汉诺塔问题 | OJ 04147 | 递归 |
 | 2 | Ultra-QuickSort | OJ 02299 | 归并求逆序对 |
 | 3 | 数组中的第K个最大元素 | LC 215 | 快速选择 / 堆 |
 | 4 | 合并K个升序链表 | LC 23 | 分治归并 |
