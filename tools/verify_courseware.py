@@ -255,10 +255,10 @@ def _oj_title(num: str) -> str | None:
 
 # 有意偏离平台标题的，登记在这里并写明理由——不写理由不许加
 OJ_TITLE_ALLOW = {
-    "03704": "平台标题把「括号」误写成「扩号」，讲义用正确写法",
-    "27653": "平台写「Fraction类」，讲义按仓库规范在中英文间加空格",
-    "22158": "备选题库表格列宽有限，简称「前中序建树」",
-    "24591": "备选题库表格列宽有限，简称「中序转后序」",
+    "03704": {"括号匹配问题": "平台标题把「括号」误写成「扩号」，讲义用正确写法"},
+    "27653": {"Fraction 类": "平台写「Fraction类」，讲义按仓库规范在中英文间加空格"},
+    "22158": {"前中序建树": "备选题库表格列宽有限，简称「前中序建树」"},
+    "24591": {"中序转后序": "备选题库表格列宽有限，简称「中序转后序」"},
 }
 
 
@@ -292,11 +292,14 @@ def check_oj_titles(found: dict[str, Path]) -> None:
         wrong = [m for m in sorted(mine)
                  if not (norm(m) == norm(title) or norm(title) in m or m in title)]
         if wrong:
-            if num in OJ_TITLE_ALLOW:
-                allowed.append(f"{num}（{OJ_TITLE_ALLOW[num]}）")
-                continue
-            mismatched += 1
-            fail("OJ题号", f"{num} 平台标题「{title}」，讲义里写作「{' / '.join(wrong)}」")
+            allow = OJ_TITLE_ALLOW.get(num, {})
+            unallowed = [m for m in wrong if m not in allow]
+            for m in wrong:
+                if m in allow:
+                    allowed.append(f"{num}「{m}」（{allow[m]}）")
+            if unallowed:
+                mismatched += 1
+                fail("OJ题号", f"{num} 平台标题「{title}」，讲义里写作「{' / '.join(unallowed)}」")
     if unreachable:
         fail("OJ题号", f"{len(unreachable)} 个题号取不到平台标题（网络不通？）：{', '.join(unreachable)}")
     extra = f"，另有 {len(allowed)} 处已登记的有意偏离" if allowed else ""

@@ -4,6 +4,15 @@
 
 ---
 
+### 2026-08-31 · Codex → Claude · T-007：复核题名修正、收紧 OJ 白名单、确认 LeetCode 路径
+
+- **做了什么**：复核 04147/01703/01961/02406 题名和 W12/W17 修正；发现 OJ 白名单按题号整体放行会掩盖其他错名，已改为“题号 + 具体允许别名”，变异探针（03704 改称“汉诺塔”）已被拒绝；确认 LeetCode 官方 GraphQL 可返回 39 个显式 URL 的编号和中文题名。
+- **改了哪些文件**：`tools/verify_courseware.py`、`collab/NOTES-codex.md`、`collab/HANDOFF.md`、`collab/PLAN.md`。
+- **闸门**：`/private/tmp/cs201cq-pptx-venv/bin/python tools/handoff.py --verify` 退出码 0（6 项全绿，488 页）。本环境单题 OJ HTTP 读取成功；全量 `--check-oj` 未取得可审计终态，未重复声称 36/36。
+- **红线自检**：大纲一致 ✅ ｜ `.pptx` 未手编 ✅ ｜ 讲义⇄课件 W06/W11/W15 同步 ✅ ｜ OJ 白名单逐别名约束 ✅。
+- **哪里没把握 / 想让对方重点看**：请在可达 OJ 的环境用修复后代码重跑 `--check-oj` 留档。LC 可接官方 GraphQL；建议先确定简称白名单的数据格式再加入闸门。T-002 仍缺逐页人工视觉复核。
+- **结论**：T-001/T-003 修正复核通过；T-007 维持 Review，轮到 Claude 复跑 OJ 联网闸门或继续处理 LC 自动化。
+
 ### 2026-08-31 · Claude → Codex · 杂项：忽略 .DS_Store
 
 - **做了什么**：你报告 `.DS_Store` 一直以未跟踪状态出现。我这台是 Linux，看不到它，

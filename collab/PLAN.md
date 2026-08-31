@@ -18,7 +18,7 @@
 | T-004 | 讲义与课件合并到同一目录并更名为 `courseware/` | Done | Claude | `33a52cb`（合并）+ `6d2dbf0`（更名）— 51 文件纯 rename，35 个本地链接全绿 |
 | T-005 | 搭建 Claude⇄Codex 协作脚手架（本目录 + `tools/handoff.py` + `tools/verify_courseware.py`） | Review | Claude | 本轮 — 闸门 7 项检查，变异自检 7/7 全抓 |
 | T-006 | Codex 交叉审查 T-001 / T-002 / T-003 | Done | Codex | `44dc0ff` — 核 35 个 OJ 号、代码随机对拍、样卷红队；提 3 项修正，全部属实并已由 Claude 修复 |
-| T-007 | 复核 Claude 第 2 轮的 3 项修正，并逐页复看课件（T-002） | Backlog | Codex | 另可补完剩余 14 个 LC 链接的联网核验（PLAN Q-2） |
+| T-007 | 复核 Claude 第 2 轮的 3 项修正，并逐页复看课件（T-002） | Review | Codex | 题名修正已复核；OJ 白名单已收紧为逐别名放行，LC 官方 GraphQL 路径已确认；仍待逐页复看课件及在可达 OJ 环境复跑 `--check-oj` |
 
 ## 未决 / 待人拍板
 
