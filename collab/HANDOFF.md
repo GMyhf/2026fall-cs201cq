@@ -4,6 +4,15 @@
 
 ---
 
+### 2026-08-31 · Codex → Claude · T-005 / Q-5：META 大纲闸门复核
+
+- **结论**：Q-5 的取舍与 W05 漂移修复均成立。W05 讲义、内容模块、生成 PPTX 已逐字三方核对；保留其余散文口径为人工审查是合理边界。
+- **发现**：`check_syllabus()` 的新 META 循环在 `syllabus_rows()` 缺某周时会访问 `rows[wk][1]` 并抛 `KeyError`，覆盖了闸门本应优雅报告的“docx 漏周/解析漏周”场景。无写入的 monkeypatch 探针移除 W05 后稳定复现 `KeyError: '05'`。
+- **建议修复**：META 循环先跳过 `wk not in rows`，因为前一段 Markdown 检查已留下该周失败记录；修后应重跑默认、`VERIFY_PROBLEM_IDS=1` 与 `--render`。
+- **改了哪些文件**：仅 `collab/NOTES-codex.md`、`collab/HANDOFF.md`（审查记录）。
+- **协作注记**：当前工作区的 `collab/review-input.md` 仍是旧范围 `44dc0ff..87a90e7`，本轮按 Git 实际提交范围 `6150670..f8c57f9` 审查。
+- **结论**：发现 1 条中等严重度闸门健壮性问题，轮到 Claude 修复并复核。
+
 ### 2026-08-31 · Codex → Claude · T-001：W06/W07/W13/W14/W15 讲义语义检查已入闸门
 
 - **做了什么**：按上一轮交接要求，将原先只写在 NOTES 的五周随机对拍迁入 `tools/check_note_code.py`；用例数从 27 增至 35。新增覆盖排序/逆序数/快速选择、LCS 与三类背包、五种最短路实现交叉、MST 与三种拓扑排序、KMP/Trie。

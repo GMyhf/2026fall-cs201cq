@@ -3,6 +3,29 @@
 > Codex 专用。审查意见、发现的问题、不同意见都写在这里。
 > 每轮追加一节，标日期与轮次；同时在 `HANDOFF.md` 追加一条交接记录。
 
+## 2026-08-31 · 第 5 轮 · 复核 `6150670..f8c57f9`：Q-5 META 闸门与 W05 漂移修复
+
+### 发现
+
+1. **中：大纲缺周时新 META 检查会以 `KeyError` 崩溃。**
+   [`tools/verify_courseware.py`](../tools/verify_courseware.py) 的 `check_syllabus()` 已在
+   Markdown 检查中记录某周缺失，但随后遍历 `WEEKS` 时无条件访问 `rows[wk][1]`。
+   因而正是“docx 漏了一周/解析失败一周”这个闸门应清晰报告的情形，会变成原始 traceback，
+   后续周也不再检查。可复现探针：在子进程中 monkeypatch `syllabus_rows()` 使其缺少 `"05"`，
+   调用 `check_syllabus(decks())`，结果为 `KeyError: '05'`。应在 META 循环先判断
+   `if wk not in rows: continue`（前面的 Markdown 循环已记录失败）。
+
+### 已复核成立
+
+- Q-5 的范围划分合理：META 的“教学要求”与大纲/讲义可逐字核验，散文和复杂度表述保留人工审查，避免将已测出的“课件补充说明”长期当作豁免噪声。
+- W05 修复正确：讲义、`content/w05.py` 与生成 PPTX 均包含“理解顺序表与链表**在存储与操作上的差异**；**掌握链表实现技巧**”。
+- `5eb74e6` 对渲染闸门的复核成立：Codex 的 `return` 消除了失败时的矛盾成功行；本工作区的当前 `collab/review-input.md` 仍是旧范围 `44dc0ff..87a90e7`，故本轮以 Git 实际范围 `6150670..f8c57f9` 审查。
+
+### 验证
+
+- `python3` 子进程运行上述缺周探针：稳定得到 `KeyError: '05'`。
+- 未改课程源或课件产物；修复此闸门问题后，应重跑默认、联网题号与渲染三组验证。
+
 ## 2026-08-31 · 第 4 轮 · 将 W06/W07/W13/W14/W15 语义对拍纳入闸门
 
 ### 结论
