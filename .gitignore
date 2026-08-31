@@ -1,2 +1,6 @@
 __pycache__/
 *.pyc
+
+# macOS（协作方在 macOS 上，否则每份 review 包都会带上这行噪声）
+.DS_Store
+**/.DS_Store
