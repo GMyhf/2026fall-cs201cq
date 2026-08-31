@@ -489,6 +489,32 @@ def check_lc_titles(found: dict[str, Path]) -> None:
 
 
 # --------------------------------------------------------------- 10 渲染
+# Codex 指出的盲点：缺中文字体时 LibreOffice 会把汉字画成方框，
+# 但 PDF 里的 Unicode 文本仍然正确 —— 于是"文字未越界"照样通过，人却一个字看不清。
+# 这里改从产物判断：PDF 必须真嵌入了带 CJK 的字体。
+# ⚠️ 局限：靠字体名判断覆盖范围并不严格（名字像 CJK 不等于字全）；
+# 但"一个 CJK 字体都没嵌"是字体替换的强证据，足以拒绝签发"渲染通过"。
+CJK_FONT = re.compile(r"CJK|Han|Hei|Song|Ming|Gothic|Kai|YaHei|SimSun|PingFang|STSong|Source ?Han",
+                      re.I)
+
+
+def has_cjk_font(pdffonts_output: str) -> bool:
+    """pdffonts 的输出里是否有 CJK 字体（且已嵌入）。"""
+    for line in pdffonts_output.splitlines()[2:]:      # 前两行是表头
+        if not line.strip():
+            continue
+        cols = line.split()
+        # pdffonts 列序：name type encoding emb sub uni objID(2 个 token)
+        # 从末尾取才稳妥 —— "Type 1" 是两个 token，"TrueType" 只有一个
+        if len(cols) < 6:
+            continue
+        name, emb = cols[0], cols[-5]
+        if CJK_FONT.search(name) and emb == "yes":
+            return True
+    return False
+
+
+
 def check_render() -> None:
     soffice = shutil.which("libreoffice") or shutil.which("soffice")
     if not soffice or not shutil.which("pdftotext"):
@@ -508,6 +534,22 @@ def check_render() -> None:
                 suffix += f"：{detail[:500]}"
             fail("渲染", f"只渲染出 {len(pdfs)} 个 PDF，预期 16 个{suffix}")
             return
+        # 先确认这批 PDF 真的嵌了中文字体，否则"未越界"毫无意义
+        if shutil.which("pdffonts"):
+            no_cjk = []
+            for pdf in pdfs:
+                out = subprocess.run(["pdffonts", str(pdf)],
+                                     capture_output=True, text=True).stdout
+                if not has_cjk_font(out):
+                    no_cjk.append(pdf.stem)
+            if no_cjk:
+                fail("渲染", f"{len(no_cjk)} 份 PDF 未嵌入中文字体，正文很可能是方框"
+                             f"（渲染环境缺中文字体？）：{', '.join(no_cjk[:3])}…"
+                             f"　—— 此时「文字未越界」不能作为可读性证据")
+                return
+        else:
+            notes.append("渲染：未找到 pdffonts，跳过中文字体嵌入检查")
+
         pages = bad = 0
         for pdf in pdfs:
             out = subprocess.run(["pdftotext", "-bbox", str(pdf), "-"],
@@ -526,7 +568,8 @@ def check_render() -> None:
                     if x1 > 930 or (y1 > 518 and y0 < 488):
                         bad += 1
                         fail("渲染", f"{pdf.stem} 第 {pno} 页文字越界: {w.text!r}")
-        notes.append(f"渲染：{pages} 页全部渲染通过，越界 {bad} 处")
+        notes.append(f"渲染：{pages} 页全部渲染通过，越界 {bad} 处"
+                     f"（{len(pdfs)} 份 PDF 均已嵌入中文字体）")
 
 
 # ---------------------------------------------------------------- main

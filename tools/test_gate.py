@@ -121,6 +121,31 @@ def t_oj_allowlist_is_per_alias():
            run({"03704": {"汉诺塔": "无关别名"}}), "换个别名就该继续失败")
 
 
+def t_cjk_font_detection():
+    """渲染产物必须真嵌入中文字体 —— 缺字体时会画方框，而越界检查照样通过。
+
+    Codex 在 macOS 上发现：LibreOffice 缺中文字体会把汉字导成方框，
+    但 PDF 里的 Unicode 文本仍然正确，`pdftotext` 抽得出、越界也测不出。
+    所以"文字未越界"不能当作可读性证据。
+    """
+    vc = fresh()
+    hdr = ("name  type  encoding  emb sub uni object ID\n"
+           "---   ---   ---       --- --- --- ---\n")
+    cases = {
+        "有 CJK 且嵌入（Type 1）":
+            (hdr + "BAAAAA+NotoSansCJKsc-Bold  Type 1  Builtin  yes yes yes 1024 0", True),
+        "有 CJK 且嵌入（TrueType）":
+            (hdr + "X+SourceHanSansSC  TrueType  Identity-H  yes yes yes 20 0", True),
+        "只有拉丁字体（缺中文字体的典型产物）":
+            (hdr + "CAAAAA+NotoSans-Bold  TrueType  WinAnsi  yes yes yes 1014 0", False),
+        "有 CJK 但未嵌入":
+            (hdr + "BAAAAA+NotoSansCJKsc-Bold  Type 1  Builtin  no  no  yes 1024 0", False),
+        "空输出": ("", False),
+    }
+    for label, (text, want) in cases.items():
+        expect(f"CJK 字体判定：{label}", vc.has_cjk_font(text) is want)
+
+
 def t_positive_control():
     """反向对照：不喂错误输入时，这些检查必须一条失败都没有。
 
@@ -199,7 +224,7 @@ def main():
     cases = (t_missing_week_does_not_crash, t_deck_meta_drift_caught,
              t_render_failure_reports_exit_code, t_oj_allowlist_is_per_alias,
              t_lc_per_occurrence_not_masked, t_lc_allowlist_is_per_alias,
-             t_positive_control)
+             t_cjk_font_detection, t_positive_control)
     # 泄漏检查逐用例执行，而不是只在最后跑一次。
     # 只在最后查，既依赖用例顺序（有人往后插一个用例就失效），
     # 也说不出是哪个用例漏的 —— Codex 的建议。
