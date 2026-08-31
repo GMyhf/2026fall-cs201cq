@@ -162,9 +162,11 @@ def run_verify():
     两件事分开跑：
       verify_courseware.py  文档之间是否自洽（配对/大纲/链接/语法/可重生成/题号）
       check_note_code.py    讲义里的算法代码算得对不对（与暴力解随机对拍）
+      test_gate.py          闸门自己的失败路径报错报得对不对
     """
     steps = [[sys.executable, "tools/verify_courseware.py"],
-             [sys.executable, "tools/check_note_code.py"]]
+             [sys.executable, "tools/check_note_code.py"],
+             [sys.executable, "tools/test_gate.py"]]
     # 渲染检查很慢（约 2–4 分钟）且依赖 libreoffice，默认不进闸门；
     # 改动 courseware/deck.py（排版引擎）时必须手工补跑一次 --render，
     # 因为版面溢出只有真渲染才看得见 —— 这一条写进了 NOTES 模板。

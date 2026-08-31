@@ -147,6 +147,8 @@ def check_syllabus(found: dict[str, Path]) -> None:
             continue
         spec = importlib.util.spec_from_file_location(f"_w{wk}", mod_path)
         mod = importlib.util.module_from_spec(spec)
+        if wk not in rows:
+            continue                      # 缺周已由上面的循环记过失败，这里不再重复也不能索引
         spec.loader.exec_module(mod)
         info = " ".join(getattr(mod, "META", {}).get("info", []))
         m = re.search(r"教学要求[：:](.+)", info)
