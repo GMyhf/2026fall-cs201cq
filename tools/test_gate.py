@@ -121,6 +121,38 @@ def t_oj_allowlist_is_per_alias():
            run({"03704": {"汉诺塔": "无关别名"}}), "换个别名就该继续失败")
 
 
+def t_collab_bookkeeping():
+    """协作账目检查的失败路径 —— Codex 指出它此前没有任何回归。"""
+    import tempfile
+    hdr = ("## 状态看板\n\n| ID | 任务 | 状态 | 负责 | 关联提交 / 备注 |\n"
+           "| --- | --- | --- | --- | --- |\n")
+
+    def run(plan_body, other=""):
+        vc = fresh()
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "collab").mkdir()
+            (root / "collab" / "PLAN.md").write_text(hdr + plan_body, encoding="utf-8")
+            if other:
+                (root / "collab" / "HANDOFF.md").write_text(other, encoding="utf-8")
+            with patched((vc, "ROOT", root)):
+                vc.check_collab()
+        return vc.failures
+
+    ok_row = "| T-001 | 正常任务 | Done | Claude | 备注 |\n"
+    expect("协作账目：合法看板零失败", not run(ok_row), str(run(ok_row)))
+    expect("协作账目：悬空 T-编号被抓",
+           any("T-099" in f for f in run(ok_row, "见 T-099 的处理")))
+    expect("协作账目：多出一列被抓",
+           any("列" in f for f in run("| T-001 | 任务 | Done | Claude | 备注 | 多一格 |\n")))
+    expect("协作账目：非法状态被抓",
+           any("状态" in f for f in run("| T-001 | 任务 | 完成 | Claude | 备注 |\n")))
+    # Codex 指出的静默覆盖：两条同号任务原本会被并成一条且不报错
+    dup = ok_row + "| T-001 | 另一条同号任务 | Review | Codex | 备注 |\n"
+    expect("协作账目：重复任务号被抓",
+           any("不止一次" in f for f in run(dup)), str(run(dup)))
+
+
 def t_cjk_font_detection():
     """渲染产物必须真嵌入中文字体 —— 缺字体时会画方框，而越界检查照样通过。
 
@@ -131,19 +163,24 @@ def t_cjk_font_detection():
     vc = fresh()
     hdr = ("name  type  encoding  emb sub uni object ID\n"
            "---   ---   ---       --- --- --- ---\n")
-    cases = {
-        "有 CJK 且嵌入（Type 1）":
-            (hdr + "BAAAAA+NotoSansCJKsc-Bold  Type 1  Builtin  yes yes yes 1024 0", True),
-        "有 CJK 且嵌入（TrueType）":
-            (hdr + "X+SourceHanSansSC  TrueType  Identity-H  yes yes yes 20 0", True),
-        "只有拉丁字体（缺中文字体的典型产物）":
-            (hdr + "CAAAAA+NotoSans-Bold  TrueType  WinAnsi  yes yes yes 1014 0", False),
-        "有 CJK 但未嵌入":
-            (hdr + "BAAAAA+NotoSansCJKsc-Bold  Type 1  Builtin  no  no  yes 1024 0", False),
-        "空输出": ("", False),
-    }
-    for label, (text, want) in cases.items():
-        expect(f"CJK 字体判定：{label}", vc.has_cjk_font(text) is want)
+    row = "ABCDEF+{}  TrueType  Identity-H  yes yes yes 10 0"
+    # Codex 发现原表漏了 Noto 新命名（NotoSansCJKsc 已拆成 NotoSansSC/TC/…），
+    # 可读 PDF 会被误拒。误拒比漏判更糟，所以正例样本按家族铺开。
+    yes_fonts = ["NotoSansCJKsc-Bold", "NotoSansSC-Regular", "NotoSerifSC-Bold",
+                 "NotoSansTC-Regular", "NotoSansMonoCJKsc-Regular", "SourceHanSansSC",
+                 "MicrosoftYaHei", "SimSun", "PingFangSC-Regular", "STSong",
+                 "WenQuanYiMicroHei", "DroidSansFallback", "MSGothic", "HiraKakuProN"]
+    # 反例里特意放了 CenturyGothic —— 名字含 Gothic 但是拉丁字体
+    no_fonts = ["NotoSans-Bold", "DejaVuSansMono", "Helvetica", "TimesNewRoman",
+                "CenturyGothic", "Arial", "NotoColorEmoji"]
+    miss = [f for f in yes_fonts if not vc.has_cjk_font(hdr + row.format(f))]
+    false_pos = [f for f in no_fonts if vc.has_cjk_font(hdr + row.format(f))]
+    expect(f"CJK 字体判定：{len(yes_fonts)} 个中文字体全部识别", not miss, f"漏判：{miss}")
+    expect(f"CJK 字体判定：{len(no_fonts)} 个拉丁字体均不误判", not false_pos,
+           f"误判：{false_pos}")
+    expect("CJK 字体判定：有 CJK 但未嵌入 -> 不通过",
+           not vc.has_cjk_font(hdr + "B+NotoSansCJKsc-Bold  Type 1  Builtin  no  no  yes 1 0"))
+    expect("CJK 字体判定：空输出 -> 不通过", not vc.has_cjk_font(""))
 
 
 def t_positive_control():
@@ -224,7 +261,7 @@ def main():
     cases = (t_missing_week_does_not_crash, t_deck_meta_drift_caught,
              t_render_failure_reports_exit_code, t_oj_allowlist_is_per_alias,
              t_lc_per_occurrence_not_masked, t_lc_allowlist_is_per_alias,
-             t_cjk_font_detection, t_positive_control)
+             t_collab_bookkeeping, t_cjk_font_detection, t_positive_control)
     # 泄漏检查逐用例执行，而不是只在最后跑一次。
     # 只在最后查，既依赖用例顺序（有人往后插一个用例就失效），
     # 也说不出是哪个用例漏的 —— Codex 的建议。

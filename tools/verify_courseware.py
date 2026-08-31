@@ -285,7 +285,13 @@ def check_collab() -> None:
             continue
         if cols[1] not in STATUSES:
             fail("协作账目", f"{m.group(1)} 的状态 {cols[1]!r} 不在 {sorted(STATUSES)} 中")
-        board[m.group(1)] = cols[1]
+        tid = m.group(1)
+        if tid in board:
+            # Codex 指出：原来直接赋值，两条同号任务会被静默并成一条。
+            # 同号意味着两处在讲同一件事却各自记状态，看板就不再是唯一事实源。
+            fail("协作账目", f"{tid} 在看板上出现了不止一次（状态：{board[tid]} / {cols[1]}）")
+            continue
+        board[tid] = cols[1]
 
     missing = {}
     for f in sorted(collab.glob("*.md")):
@@ -494,8 +500,19 @@ def check_lc_titles(found: dict[str, Path]) -> None:
 # 这里改从产物判断：PDF 必须真嵌入了带 CJK 的字体。
 # ⚠️ 局限：靠字体名判断覆盖范围并不严格（名字像 CJK 不等于字全）；
 # 但"一个 CJK 字体都没嵌"是字体替换的强证据，足以拒绝签发"渲染通过"。
-CJK_FONT = re.compile(r"CJK|Han|Hei|Song|Ming|Gothic|Kai|YaHei|SimSun|PingFang|STSong|Source ?Han",
-                      re.I)
+# 字体名清单。Codex 发现原表漏了 Noto 的新命名 —— Google 已把 NotoSansCJKsc
+# 拆成 NotoSansSC/TC/HK/JP/KR，装了新版 Noto 的机器会被误判成"没有中文字体"，
+# 可读的 PDF 反而被拒签。误拒比漏判更糟：它挡住的是本来正确的交付。
+# `Gothic` 要排除 Century Gothic（拉丁字体），否则会反向误判为有中文。
+CJK_FONT = re.compile(
+    r"CJK"
+    r"|SourceHan|Han(Sans|Serif|Mono)"
+    r"|Noto(Sans|Serif)(Mono)?(SC|TC|HK|JP|KR)"
+    r"|Hei(ti)?|Song(ti)?|Ming(Liu)?|(?<!Century)Gothic|Kai(Ti)?|FangSong"
+    r"|YaHei|JhengHei|SimSun|SimHei|NSimSun|PingFang|MSung|MHei"
+    r"|ST(Song|Heiti|Kaiti|Fangsong)|WenQuanYi|Droid ?Sans ?Fallback"
+    r"|Hira(Kaku|Min)|Meiryo|Malgun|Batang|Dotum|Gulim|Nanum",
+    re.I)
 
 
 def has_cjk_font(pdffonts_output: str) -> bool:
