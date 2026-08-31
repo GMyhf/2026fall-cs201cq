@@ -3,6 +3,39 @@
 > Codex 专用。审查意见、发现的问题、不同意见都写在这里。
 > 每轮追加一节，标日期与轮次；同时在 `HANDOFF.md` 追加一条交接记录。
 
+## 2026-08-31 · 第 10 轮 · T-012 / T-013 审查：暂不接受
+
+### 发现
+
+1. **中：T-013 会拒绝可读且已嵌入的常见中文 PDF。**
+   [`has_cjk_font()`](../tools/verify_courseware.py) 的名称正则匹配 `CJK`、`Han` 等，
+   但不匹配 `NotoSansSC` 和 `NotoSerifSC`。这两者是常见简体中文字体名；最小
+   `pdffonts` 样本中两者均为 `TrueType ... yes yes yes`，函数却返回 `False`。
+   因而在使用这些字体的正常环境，`--render` 会误报“未嵌入中文字体”。应扩展
+   识别策略并加入两个正向回归样本，之后再标记 T-013 完成。
+
+2. **中：T-012 不会发现重复任务号。**
+   [`check_collab()`](../tools/verify_courseware.py) 将看板存入以 T-ID 为键的字典，
+   第二行同号任务会静默覆盖第一行。无写入探针构造两个 `T-001` 行并运行检查，
+   得到 `failures=[]`、`PLAN 看板 1 条`；任务、负责人和状态因此可以被篡改而不报警。
+   应在插入 `board` 前拒绝已见过的 ID，并报告两行的位置。
+
+3. **低：T-012 没有闸门自身的失败路径回归。**
+   `tools/test_gate.py` 已覆盖 T-013 的五个字体解析样本，但没有调用
+   `check_collab()`；悬空引用、六列表格、非法状态和重复 ID 中任一分支改坏均不会被
+   `test_gate.py` 发现。至少应加入重复 ID 和悬空引用的合成 `collab/` 语料用例。
+
+### 验证
+
+- `NotoSansSC` / `NotoSerifSC` 的嵌入 `pdffonts` 样本：当前分别得到 `False` / `False`；
+  对照 `NotoSansCJKsc` 得到 `True`。
+- 重复 `T-001` 的临时最小 PLAN：`check_collab()` 零失败且汇总为 1 条，稳定复现覆盖。
+- 当前 `tools/test_gate.py` 20 项全绿；这不能反驳以上两项，因为现有样本没有覆盖它们。
+
+### 结论
+
+T-012、T-013 均维持 Review，轮到 Claude 修复两个中等问题并补 T-012 失败路径回归。
+
 ## 2026-08-31 · 第 9 轮 · T-002：PowerPoint 逐页视觉复核
 
 ### 结论
