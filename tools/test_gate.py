@@ -12,7 +12,9 @@ Codex 已经在 `verify_courseware.py` 里连着找出三个缺陷，**三个都
 用法:
   python3 tools/test_gate.py
 """
+import contextlib
 import importlib.util
+import shutil
 import subprocess
 import sys
 import time
@@ -20,6 +22,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS: list[tuple[bool, str, str]] = []
+_ORIG_SLEEP = time.sleep          # 供泄漏检测用例比对
+_ORIG_RUN = subprocess.run
 
 
 def fresh():
@@ -28,6 +32,24 @@ def fresh():
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
+
+
+@contextlib.contextmanager
+def patched(*targets):
+    """临时替换若干 (对象, 属性名, 新值)，退出时一律还原。
+
+    Codex 指出 OJ 用例替换了全局 `time.sleep` 却不还原。自查后发现同类问题
+    还有一处且更严重：渲染用例把全局 `shutil.which` 桩成恒返回 "/bin/true"，
+    之后进程内任何命令探测都会误判为"存在"。统一走这个上下文，避免再犯。
+    """
+    saved = [(obj, attr, getattr(obj, attr)) for obj, attr, _ in targets]
+    try:
+        for obj, attr, new in targets:
+            setattr(obj, attr, new)
+        yield
+    finally:
+        for obj, attr, old in saved:
+            setattr(obj, attr, old)
 
 
 def expect(name, cond, detail=""):
@@ -73,13 +95,9 @@ def t_render_failure_reports_exit_code():
     vc = fresh()
     fake = subprocess.CompletedProcess([], returncode=1, stdout="",
                                        stderr="Error: source file could not be loaded")
-    real_run = subprocess.run
-    vc.subprocess.run = lambda *a, **k: fake
-    vc.shutil.which = lambda name: "/bin/true"
-    try:
+    with patched((subprocess, "run", lambda *a, **k: fake),
+                 (shutil, "which", lambda name: "/bin/true")):
         vc.check_render()
-    finally:
-        vc.subprocess.run = real_run
     expect("渲染失败报出退出码", any("退出码 1" in f for f in vc.failures), str(vc.failures))
     expect("渲染失败不再自称通过",
            not any("渲染" in n and "全部渲染通过" in n for n in vc.notes), str(vc.notes))
@@ -87,14 +105,14 @@ def t_render_failure_reports_exit_code():
 
 def t_oj_allowlist_is_per_alias():
     """① 白名单必须"按别名"放行，不能"按题号"整体豁免。"""
-    time.sleep = lambda *_: None                     # 测试里不必对题库限速
     plat = {"03704": "扩号匹配问题"}                  # 只桩这一个号
 
     def run(allow):
         vc = fresh()
         vc.OJ_TITLE_ALLOW = allow
         vc._oj_title = lambda num: plat.get(num)     # 其余号返回 None -> 记为取不到
-        vc.check_oj_titles(vc.decks())
+        with patched((time, "sleep", lambda *_: None)):   # 测试里不必对题库限速
+            vc.check_oj_titles(vc.decks())
         return hits(vc, "03704")
 
     expect("无白名单时不符会失败", run({}), "空白名单下 03704 应当失败")
@@ -115,10 +133,23 @@ def t_positive_control():
     expect("正常输入下大纲/链接零失败", not vc.failures, str(vc.failures))
 
 
+def t_no_global_patch_leaks():
+    """所有用例跑完后，被临时替换过的全局函数必须已还原。
+
+    这条是给测试文件自己用的。前面的用例会桩 `subprocess.run` /
+    `shutil.which` / `time.sleep`；只要有一处忘了还原，进程内后续行为就被污染，
+    而且不会有任何报错——正是这条断言要拦的。
+    """
+    expect("shutil.which 未被污染",
+           shutil.which("definitely-not-a-real-binary-xyz") is None)
+    expect("time.sleep 已还原", time.sleep is _ORIG_SLEEP)
+    expect("subprocess.run 已还原", subprocess.run is _ORIG_RUN)
+
+
 def main():
     for fn in (t_missing_week_does_not_crash, t_deck_meta_drift_caught,
                t_render_failure_reports_exit_code, t_oj_allowlist_is_per_alias,
-               t_positive_control):
+               t_positive_control, t_no_global_patch_leaks):
         try:
             fn()
         except Exception as e:

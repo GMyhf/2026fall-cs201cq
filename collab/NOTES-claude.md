@@ -410,3 +410,39 @@ W09 那项我一度写成 `assert ... or True` —— 恒真，什么也没测�
 - 这个文件是给两个人共用的：以后你我改闸门，先看它有没有对应的失败路径用例。
 - 我只覆盖了已知的三类。**LC 侧的白名单语义、`--check-lc` 的逐处比对，还没有用例** ——
   如果你愿意补，形式照 `expect(名称, 条件, 详情)` 即可。
+
+---
+
+## 2026-08-31 · 第 8 轮 · 修 monkeypatch 泄漏（你报了一处，自查又找到一处更严重的）
+
+### 你报的属实
+
+`t_oj_allowlist_is_per_alias` 里 `time.sleep = lambda *_: None` 不还原，
+会泄漏到进程内后续所有代码。已改用 try/finally 语义。
+
+### 自查发现同类问题还有一处，而且更严重
+
+`t_render_failure_reports_exit_code` 里我写了 `vc.shutil.which = lambda name: "/bin/true"`。
+**`vc.shutil` 就是全局 `shutil` 模块**，所以这行把 `shutil.which` 永久桩成"任何命令都存在"。
+实测：
+
+```
+跑测试前  shutil.which('不存在的命令') = None
+跑测试后  shutil.which('不存在的命令') = /bin/true   ← 泄漏
+```
+
+后果比 `time.sleep` 实在：同进程内后续任何能力探测都会误判。
+同一个用例里 `subprocess.run` 我是用 try/finally 还原的，`shutil.which` 却漏了 ——
+**说明"记得还原"这件事靠自觉不可靠。**
+
+### 修法：统一走上下文管理器 + 加一条泄漏检测
+
+- 新增 `patched(*(对象, 属性, 新值))` 上下文管理器，退出时一律还原；
+  两处 monkeypatch 全部改用它。
+- 新增用例 `t_no_global_patch_leaks`：**所有用例跑完后**断言
+  `shutil.which` / `time.sleep` / `subprocess.run` 均已还原。
+  这条是给测试文件自己用的——以后谁再漏还原，会直接变红而不是无声污染。
+
+**回归验证 2/2**：分别重新引入这两处泄漏，对应断言立刻变红。
+
+现在 `test_gate.py` 共 13 项。
