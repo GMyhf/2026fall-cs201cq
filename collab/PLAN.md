@@ -13,12 +13,12 @@
 | ID | 任务 | 状态 | 负责 | 关联提交 / 备注 |
 | --- | --- | --- | --- | --- |
 | T-001 | 按教学大纲第四节生成第 2–17 周讲义（16 份 `.md`，含完整题解、例题、作业、实验） | Done | Claude | `5e7538c` — Codex 第 1 轮核了 35 个 OJ 号、抽查了堆/排序/三种最短路，提 2 项修正（OJ 06263 误称汉诺塔、OJ 05443 误分类）；Claude 第 2 轮已修并补 11 条 LC 联网核验，待 Codex 复核置 Done |
-| T-002 | 为第 2–17 周制作课件（16 份 `.pptx`，488 页），并把排版做成可重复生成的脚本 | Review | Claude | `7eda7f7` — 引擎 `courseware/deck.py` + 内容 `content/wNN.py`；渲染检查已过 |
+| T-002 | 为第 2–17 周制作课件（16 份 `.pptx`，488 页），并把排版做成可重复生成的脚本 | Done | Claude | `7eda7f7` — 引擎 `courseware/deck.py` + 内容 `content/wNN.py`；Codex 以 PowerPoint 16.112.2 逐页复看 488 页，无版式缺陷；LibreOffice/macOS 中文字体兼容性风险已留档 |
 | T-003 | 第 17 周上机考试命题方案：覆盖矩阵、样卷 6 题（题面+样例+参考解答+数据构造+评分）、备选题库 | Done | Claude | `5e7538c` 内 — Codex 已以满规模压测和 T1–T6 WA 探针复核；T1/T4/T6 对抗数据已加强并同步课件源，参考解答未发现合法输入 WA/TLE；仍待目标 OJ 时限与 AC 率决策 |
 | T-004 | 讲义与课件合并到同一目录并更名为 `courseware/` | Done | Claude | `33a52cb`（合并）+ `6d2dbf0`（更名）— 51 文件纯 rename，35 个本地链接全绿 |
 | T-005 | 搭建 Claude⇄Codex 协作脚手架（本目录 + `tools/handoff.py` + `tools/verify_courseware.py`） | Done | Claude | 本轮 — 闸门 7 项检查，变异自检 7/7 全抓 |
 | T-006 | Codex 交叉审查 T-001 / T-002 / T-003 | Done | Codex | `44dc0ff` — 核 35 个 OJ 号、代码随机对拍、样卷红队；提 3 项修正，全部属实并已由 Claude 修复 |
-| T-007 | 复核 Claude 第 2 轮的 3 项修正，并逐页复看课件（T-002） | Review | Codex | 题名修正已复核；OJ 白名单已收紧为逐别名放行，LC 官方 GraphQL 路径已确认；仍待逐页复看课件及在可达 OJ 环境复跑 `--check-oj` |
+| T-007 | 复核 Claude 第 2 轮的 3 项修正，并逐页复看课件（T-002） | Done | Codex | 题名修正、逐别名白名单和 LC GraphQL 路径均已复核；OJ 36/36、LC 39/39 已入闸门；PowerPoint 16.112.2 逐页复看 488 页通过 |
 | T-008 | 用官方 GraphQL 补完 LeetCode 题号核验并进闸门 | Done | Claude | `7545bf8` — `--check-lc` 39 slug / 39 处引用全绿，变异自检 3/3；Q-2 由此销账 |
 | T-009 | 讲义代码语义测试脚手架 `tools/check_note_code.py` | Done | Claude | `a6412a9` 起 — 现 35 项，覆盖全部有可执行算法的周次；Codex `6150670` 补齐 W06/W07/W13/W14/W15 |
 | T-010 | Q-5：讲义⇄课件口径一致是否自动化 | Done | Claude | `f8c57f9` — 量过三组数据后只做 META 教学要求一段；查出并修复 W05 一处真漂移 |

@@ -4,6 +4,14 @@
 
 ---
 
+### 2026-08-31 · Codex → Claude · T-002 / T-007：PowerPoint 逐页视觉复核完成
+
+- **结论**：接受并销账。以 PowerPoint 16.112.2 导出仓库中 16 份课件为 PDF，逐页复看全部 488 页；标题、表格、图示、代码、作业和 W17 样卷页均无缺字、重叠、裁切、错位或意外空白。
+- **跨渲染器风险**：同机 LibreOffice 26.8.0.3 缺少课件指定的中文字体，中文导出为方框；其 `--render` 的“越界 0”不验证字形可读性。PowerPoint 成品正常，故不阻塞本交付；若要求 LibreOffice/macOS 可读，需单独确定字体分发或嵌入策略。
+- **闸门**：`/private/tmp/cs201cq-pptx-venv/bin/python tools/handoff.py --verify` 全绿：文档、35 项讲义语义、15 项失败路径自测均通过。
+- **改了哪些文件**：仅 `collab/PLAN.md`、`collab/NOTES-codex.md`、`collab/HANDOFF.md`（审查与交接记录）。
+- **结论**：T-002 与 T-007 均已完成；未引入课件源或产物改动。
+
 ### 2026-08-31 · Codex → Claude · T-005：复核 `acea527` 通过
 
 - **结论**：接受。LC 逐处错号、LC 白名单逐别名、逐用例 monkeypatch 泄漏三项均已获得失败路径回归覆盖。
