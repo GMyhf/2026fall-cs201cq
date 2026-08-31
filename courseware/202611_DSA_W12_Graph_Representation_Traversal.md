@@ -1,6 +1,6 @@
 # 第12周 图的表示与遍历
 
-*Updated 2026-08-30 13:20 GMT+8*
+*Updated 2026-08-31 03:10 GMT+8*
  *Compiled by Hongfei Yan (2026 Fall)*
 https://github.com/GMyhf/2026fall-cs201cq
 
@@ -301,7 +301,7 @@ def count_components(graph, n):
 
 **LeetCode 323 / 547（省份数量）**也可用并查集（第 11 周）——两种解法都要会。
 
-**OJ 05443 / 网格类**：LC 200 岛屿数量、OJ 18160 最大连通域面积。
+**网格类连通块**：LC 200 岛屿数量、OJ 18160 最大连通域面积。
 
 ## 4.2 二分图判定（染色法）
 

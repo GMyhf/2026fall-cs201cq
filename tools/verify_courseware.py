@@ -184,6 +184,14 @@ README_ROW = re.compile(r"^\| (\d+) \| `(2026\d\d_DSA_W\d\d_[^`]+)` \| (\d+) \|"
 
 
 def check_regenerate() -> None:
+    # Codex 第 1 轮的教训：缺依赖时这一项抛的是 build_all.py 的原始 traceback，
+    # 看不出"装个包就行"。先探测，给一句能照做的话。
+    probe = subprocess.run([sys.executable, "-c", "import pptx"], capture_output=True)
+    if probe.returncode != 0:
+        fail("可重生成", "缺少 python-pptx，无法重新生成课件；请先 `pip install python-pptx`"
+                         f"（当前解释器：{sys.executable}）")
+        return
+
     declared = {m.group(2): int(m.group(3))
                 for m in README_ROW.finditer((CW / "README.md").read_text(encoding="utf-8"))}
     if len(declared) != 16:
