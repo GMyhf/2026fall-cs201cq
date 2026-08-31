@@ -46,6 +46,22 @@ python3 tools/verify_courseware.py --render   # 加第 7 项渲染检查，约 2
 | 6 | 可重生成 | 课件能从 `content/` 重新生成，页数与 README 声明一致 |
 | 7 | 渲染 | （需 libreoffice + pdftotext）逐页检查文字未越出版心 |
 
+### 另一半：`tools/check_note_code.py`
+
+闸门只验语法——**代码能被 parse，不代表它算得对**。语义由这个脚本负责：
+把讲义里的实现**原样抽出来执行**，与暴力解 / 标准库随机对拍。
+
+```bash
+python3 tools/check_note_code.py            # 全部，约 0.3 秒
+python3 tools/check_note_code.py W04 W09    # 只跑指定周次
+```
+
+当前 27 项，覆盖 W04/W05/W08/W09/W10/W11/W12。做过变异自检
+（改坏括号匹配的收尾、二分图染色不换色）——都能变红。
+
+> 抽取时用 AST 剥掉块尾的 OJ 驱动代码（`n = int(input())` 之类），
+> 只保留 import / def / class / 常量赋值，所以不会阻塞读 stdin。
+
 第 3 项直接解析 `重庆人工智能学院课程教学大纲-闫宏飞.docx` 的第四节表格，
 所以**大纲是唯一事实源**：改主题必须先改大纲，或在 PLAN 里写明偏离理由。
 
