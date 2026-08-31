@@ -425,10 +425,15 @@ def check_render() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         cmd = [soffice, "--headless", "--convert-to", "pdf", "--outdir", tmp,
                *map(str, sorted(CW.glob("*.pptx")))]
-        subprocess.run(cmd, capture_output=True, text=True, timeout=1800)
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=1800)
         pdfs = sorted(Path(tmp).glob("*.pdf"))
         if len(pdfs) != 16:
-            fail("渲染", f"只渲染出 {len(pdfs)} 个 PDF，预期 16 个")
+            detail = (proc.stdout + proc.stderr).strip().replace("\n", " ")
+            suffix = f"；LibreOffice 退出码 {proc.returncode}"
+            if detail:
+                suffix += f"：{detail[:500]}"
+            fail("渲染", f"只渲染出 {len(pdfs)} 个 PDF，预期 16 个{suffix}")
+            return
         pages = bad = 0
         for pdf in pdfs:
             out = subprocess.run(["pdftotext", "-bbox", str(pdf), "-"],

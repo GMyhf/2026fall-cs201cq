@@ -324,6 +324,93 @@ def _():
 
 
 
+# ===================================================== W06 递归、分治与排序
+@case("W06", "希尔 / 归并 / 快排 vs sorted；逆序数 vs 枚举")
+def _():
+    ns = load("W06", "def shell_sort(a):", "def merge_sort(a):",
+              "def merge_sort_inplace(a, lo=0, hi=None, buf=None):",
+              "def sort_count(a):", "def quick_sort(a):",
+              "def quick_sort_inplace(a, lo=0, hi=None):")
+    for _ in range(200):
+        a = [random.randint(-9, 9) for _ in range(random.randint(0, 24))]
+        want = sorted(a)
+        assert ns["shell_sort"](a[:]) == want, a
+        assert ns["merge_sort"](a[:]) == want, a
+        b = a[:]
+        assert ns["merge_sort_inplace"](b) is None and b == want, a
+        assert ns["quick_sort"](a[:]) == want, a
+        b = a[:]
+        assert ns["quick_sort_inplace"](b) == want, a
+        got, cnt = ns["sort_count"](a[:])
+        brute = sum(a[i] > a[j] for i in range(len(a)) for j in range(i + 1, len(a)))
+        assert (got, cnt) == (want, brute), a
+
+
+@case("W06", "quick_select 第 k 小 vs sorted")
+def _():
+    f = load("W06", "def quick_select(a, k):", "def partition(a, lo, hi):")["quick_select"]
+    for _ in range(300):
+        a = [random.randint(-9, 9) for _ in range(random.randint(1, 30))]
+        want = sorted(a)
+        for k in {1, len(a), (len(a) + 1) // 2, random.randint(1, len(a))}:
+            assert f(a[:], k) == want[k - 1], (a, k)
+
+
+# ===================================================== W07 贪心与动态规划
+def _is_subsequence(needle, haystack):
+    pos = 0
+    for ch in needle:
+        pos = haystack.find(ch, pos)
+        if pos < 0:
+            return False
+        pos += 1
+    return True
+
+
+@case("W07", "LCS 两版 vs 短串子序列枚举")
+def _():
+    from itertools import combinations
+    ns = load("W07", "def lcs(s1, s2):", "def lcs_rolling(s1, s2):")
+    for _ in range(300):
+        a = "".join(random.choice("abc") for _ in range(random.randint(0, 7)))
+        b = "".join(random.choice("abc") for _ in range(random.randint(0, 7)))
+        subs = {"".join(c) for r in range(len(a) + 1) for c in combinations(a, r)}
+        want = max((len(s) for s in subs if _is_subsequence(s, b)), default=0)
+        assert ns["lcs"](a, b) == want, (a, b)
+        assert ns["lcs_rolling"](a, b) == want, (a, b)
+
+
+@case("W07", "01 / 完全 / 多重背包 vs 枚举与记忆化参考")
+def _():
+    from functools import lru_cache
+    from itertools import product
+    ns = load("W07", "def knapsack01_2d(w, v, C):", "def knapsack01(w, v, C):",
+              "def knapsack_complete(w, v, C):", "def knapsack_multiple(w, v, cnt, C):")
+    for _ in range(200):
+        n, cap = random.randint(1, 5), random.randint(0, 14)
+        w = [random.randint(1, 5) for _ in range(n)]
+        v = [random.randint(0, 9) for _ in range(n)]
+        want01 = max((sum(v[i] for i in range(n) if mask >> i & 1)
+                      for mask in range(1 << n)
+                      if sum(w[i] for i in range(n) if mask >> i & 1) <= cap), default=0)
+        assert ns["knapsack01_2d"](w, v, cap) == want01, (w, v, cap)
+        assert ns["knapsack01"](w, v, cap) == want01, (w, v, cap)
+
+        @lru_cache(None)
+        def complete(i, rem):
+            if i == n:
+                return 0
+            return max(complete(i + 1, rem),
+                       v[i] + complete(i, rem - w[i]) if w[i] <= rem else 0)
+        assert ns["knapsack_complete"](w, v, cap) == complete(0, cap), (w, v, cap)
+
+        cnt = [random.randint(0, 4) for _ in range(n)]
+        want_multiple = max((sum(take[i] * v[i] for i in range(n))
+                             for take in product(*(range(c + 1) for c in cnt))
+                             if sum(take[i] * w[i] for i in range(n)) <= cap), default=0)
+        assert ns["knapsack_multiple"](w, v, cnt, cap) == want_multiple, (w, v, cnt, cap)
+
+
 # ===================================================== W08 搜索与回溯
 @case("W08", "子集 / 组合总和去重 / 全排列去重 vs itertools 暴力")
 def _():
@@ -728,6 +815,115 @@ def _():
                         if s not in seen:
                             seen.add(s); q.append((s, d + 1))
                 assert f(ca, cb, t) == ref, (ca, cb, t)
+
+
+# ===================================================== W13 最短路
+@case("W13", "Dijkstra 三版 / Bellman-Ford / Floyd vs 非负图最短路")
+def _():
+    ns = load("W13", "def dijkstra(graph, n, src):", "def dijkstra_v2(graph, n, src):",
+              "def dijkstra_dense(matrix, n, src):", "def bellman_ford(edges, n, src):",
+              "def floyd_warshall(n, matrix):")
+    inf = float("inf")
+    for _ in range(200):
+        n = random.randint(2, 8)
+        graph, edges = [[] for _ in range(n)], []
+        matrix = [[0 if i == j else inf for j in range(n)] for i in range(n)]
+        for u in range(n):
+            for v in range(n):
+                if u != v and random.random() < 0.35:
+                    w = random.randint(0, 9)
+                    graph[u].append((v, w)); edges.append((u, v, w))
+                    matrix[u][v] = min(matrix[u][v], w)
+        src = random.randrange(n)
+        heap, _ = ns["dijkstra"](graph, n, src)
+        bellman, negative = ns["bellman_ford"](edges, n, src)
+        floyd = ns["floyd_warshall"](n, matrix)
+        assert negative is False
+        assert heap == ns["dijkstra_v2"](graph, n, src) == ns["dijkstra_dense"](matrix, n, src)
+        assert heap == bellman == floyd[src], (graph, src)
+
+
+# ===================================================== W14 最小生成树与拓扑排序
+@case("W14", "Prim 两版 / Kruskal 在随机连通图上同权；MST 边真连通")
+def _():
+    ns = load("W14", "def prim(graph, n, start=0):", "def prim_dense(matrix, n):",
+              "class DSU:")
+    inf = float("inf")
+    for _ in range(200):
+        n = random.randint(1, 8)
+        graph = [[] for _ in range(n)]
+        matrix = [[0 if i == j else inf for j in range(n)] for i in range(n)]
+        edges = []
+
+        def add(u, v, w):
+            graph[u].append((v, w)); graph[v].append((u, w))
+            matrix[u][v] = matrix[v][u] = min(matrix[u][v], w)
+            edges.append((w, u, v))
+
+        for v in range(1, n):
+            add(random.randrange(v), v, random.randint(0, 20))
+        for u in range(n):
+            for v in range(u + 1, n):
+                if random.random() < 0.25:
+                    add(u, v, random.randint(0, 20))
+        total, chosen = ns["prim"](graph, n)
+        dense = ns["prim_dense"](matrix, n)
+        kruskal, kedges = ns["kruskal"](edges[:], n)
+        assert total == dense == kruskal and len(chosen) == len(kedges) == n - 1
+        dsu = ns["DSU"](n)
+        assert all(dsu.union(u, v) for u, v, _ in chosen)
+        assert len({dsu.find(i) for i in range(n)}) == 1
+
+
+@case("W14", "Kahn / 字典序 / DFS 拓扑排序：边次序与有环返回")
+def _():
+    ns = load("W14", "def topo_sort_kahn(graph, n):", "def topo_sort_lexicographic(graph, n):",
+              "def topo_sort_dfs(graph, n):")
+
+    def valid(graph, order):
+        return (order is not None and len(order) == len(graph)
+                and len(set(order)) == len(graph)
+                and all(order.index(u) < order.index(v)
+                        for u in range(len(graph)) for v in graph[u]))
+
+    for _ in range(200):
+        n = random.randint(1, 8)
+        graph = [[] for _ in range(n)]
+        for u in range(n):
+            for v in range(u + 1, n):
+                if random.random() < 0.35:
+                    graph[u].append(v)
+        assert all(valid(graph, ns[f](graph, n))
+                   for f in ("topo_sort_kahn", "topo_sort_lexicographic", "topo_sort_dfs")), graph
+        if n >= 2:
+            cyclic = [row[:] for row in graph]
+            cyclic[0].append(n - 1); cyclic[n - 1].append(0)
+            assert all(ns[f](cyclic, n) is None
+                       for f in ("topo_sort_kahn", "topo_sort_lexicographic", "topo_sort_dfs"))
+
+
+# ===================================================== W15 哈希、KMP 与 Trie
+@case("W15", "KMP next / 匹配 vs 前后缀枚举与朴素搜索；Trie 合同")
+def _():
+    ns = load("W15", "def build_next(pattern):", "def kmp_search(text, pattern):", "class Trie:")
+    for _ in range(400):
+        text = "".join(random.choice("abc") for _ in range(random.randint(0, 30)))
+        pattern = "".join(random.choice("abc") for _ in range(random.randint(0, 8)))
+        nxt = ns["build_next"](pattern)
+        want_next = [max((k for k in range(i + 1)
+                          if pattern[:k] == pattern[i - k + 1:i + 1]), default=0)
+                     for i in range(len(pattern))]
+        want_hits = [] if not pattern else [i for i in range(len(text) - len(pattern) + 1)
+                                             if text[i:i + len(pattern)] == pattern]
+        assert nxt == want_next, pattern
+        assert ns["kmp_search"](text, pattern) == want_hits, (text, pattern)
+    trie = ns["Trie"]()
+    for word in ("a", "ab", "abc", "b"):
+        trie.insert(word)
+    assert all(trie.search(word) for word in ("a", "ab", "abc", "b"))
+    assert not trie.search("ac") and not trie.search("abcd")
+    assert all(trie.starts_with(prefix) for prefix in ("", "a", "ab", "abc", "b"))
+    assert not trie.starts_with("c")
 
 
 def main(argv):

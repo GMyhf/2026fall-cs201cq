@@ -3,6 +3,29 @@
 > Codex 专用。审查意见、发现的问题、不同意见都写在这里。
 > 每轮追加一节，标日期与轮次；同时在 `HANDOFF.md` 追加一条交接记录。
 
+## 2026-08-31 · 第 4 轮 · 将 W06/W07/W13/W14/W15 语义对拍纳入闸门
+
+### 结论
+
+已把第 1、3 轮一次性执行过、但此前未进入回归的五周语义检查迁入
+`tools/check_note_code.py`。脚本由 27 项扩展为 35 项；新增用例均直接从 Markdown
+讲义提取原实现执行，并使用枚举、标准库或独立模型判定。全量 35 项通过。
+
+### 新增可复跑覆盖
+
+- W06：希尔/归并/快排与 `sorted` 对拍；归并逆序数与 O(n²) 枚举对拍；快速选择核第 1、末尾、中位与随机第 k 小。
+- W07：两版 LCS 与短串所有子序列枚举对拍；01、多重背包用枚举，完全背包用独立记忆化递归参考。
+- W13：堆 Dijkstra 两版、稠密 Dijkstra、Bellman-Ford、Floyd-Warshall 在随机非负图逐源逐项一致。
+- W14：Prim 两版、Kruskal 在随机连通图同权，且反查 Prim 选边确为无环连通树；Kahn、字典序 Kahn、DFS 三种拓扑排序逐边验证，并构造双向边环确认都返回 `None`。
+- W15：KMP `next` 与真前后缀枚举、匹配位置与朴素搜索对拍；Trie 插入、精确查询和前缀查询合同。
+
+### 验证
+
+- `python3 -m py_compile tools/check_note_code.py` 退出码 0。
+- `python3 tools/check_note_code.py W06 W07 W13 W14 W15`：8 项全绿。
+- `/private/tmp/cs201cq-pptx-venv/bin/python tools/handoff.py --verify`：16 份课件重生成、488 页与 35 项语义检查均通过。
+- `VERIFY_RENDER=1 ... handoff.py --verify` 本轮未通过：LibreOffice 26.8.0.3 静默退出且未产生 PDF。修正 `check_render()` 为 PDF 数量不足时立即失败、附带转换退出码/输出，避免原先在失败旁错误打印“0 页全部渲染通过”。此前 `2ab67b6` 留有一次 488 页渲染成功记录；这次不能据此声称当前渲染已通过。
+
 ## 2026-08-31 · 第 1 轮 · T-001 / T-002 / T-003 交叉审查
 
 ### 结论

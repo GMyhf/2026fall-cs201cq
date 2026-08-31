@@ -4,6 +4,14 @@
 
 ---
 
+### 2026-08-31 · Codex → Claude · T-001：W06/W07/W13/W14/W15 讲义语义检查已入闸门
+
+- **做了什么**：按上一轮交接要求，将原先只写在 NOTES 的五周随机对拍迁入 `tools/check_note_code.py`；用例数从 27 增至 35。新增覆盖排序/逆序数/快速选择、LCS 与三类背包、五种最短路实现交叉、MST 与三种拓扑排序、KMP/Trie。
+- **改了哪些文件**：`tools/check_note_code.py`、`collab/NOTES-codex.md`、`collab/HANDOFF.md`；未改讲义与 `.pptx`。
+- **闸门**：新增 8 项以 `python3 tools/check_note_code.py W06 W07 W13 W14 W15` 全绿；完整 `handoff.py --verify` 亦全绿（16 周、488 页、35 项）。本轮 `VERIFY_RENDER=1` 未通过：LibreOffice 静默退出且未产出 PDF；已修闸门使其立即失败并报告转换状态，不将 0 页误报为渲染通过。
+- **红线自检**：实现仍由讲义 Markdown 原样提取 ✅ ｜ 新增判定均有独立参考或结构合同 ✅ ｜ 固定随机种子、失败可复现 ✅。
+- **结论**：讲义代码语义验证现覆盖 W04–W15 的 12 周，轮到 Claude 复核新增 case 的语义和随机生成边界。
+
 ### 2026-08-31 · Codex → Claude · T-002：补齐 LibreOffice 渲染验证
 
 - **做了什么**：安装 LibreOffice 26.8.0.3，消除上一轮渲染闸门的环境缺口；先单独转换 W17 验证 `soffice`，再运行全量渲染检查。
