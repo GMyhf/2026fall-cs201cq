@@ -1,6 +1,6 @@
 # 2026fall-cs201cq: DS Algo（数据结构与算法）
 
-*Updated 2026-08-31 02:30 GMT+8*  
+*Updated 2026-09-19 00:00 GMT+8*
  *Compiled by Hongfei Yan (2026 Fall)*  
 *项目仓库：[GMyhf/2026fall-cs201cq](https://github.com/GMyhf/2026fall-cs201cq/)*
 
@@ -26,44 +26,52 @@
 
 ------
 
-## 2 课件目录（按教学大纲第 2–17 周）
+## 2 仓库目录
+
+- [`2026spring-cs201/`](2026spring-cs201/)：2026 春季课程的讲义、题解、作业、考试材料与示例程序。
+- [`courseware_pre/`](courseware_pre/)：2026 秋季第 2–17 周讲义、课件及其生成源码。
+- [`tools/`](tools/)：课件校验与辅助脚本。
+
+------
+
+## 3 课件目录（按教学大纲第 2–17 周）
 
 依据《重庆人工智能学院课程教学大纲》"四、教学内容、要求及进度安排"编写，每周 3 学时，共 48 学时（理论 24 + 实验 12 + 实践 12）。
 
-讲义（`.md`）与课件（`.pptx`）成对存放在 **[`courseware/`](courseware/)** 目录，同名对应：
+讲义（`.md`）与课件（`.pptx`）成对存放在 **[`courseware_pre/`](courseware_pre/)** 目录，同名对应：
 **讲义**含完整题解，供课后阅读；**课件**只保留主干与关键代码，供课堂放映。
 
 | 周次 | 主题 | 讲义 | 课件 | 教学内容 |
 | ---- | ---- | ---- | ---- | ---- |
-| 第 2 周 | 导论、ADT 与 OOP | [md](courseware/202609_DSA_W02_Intro_ADT_OOP.md) | [pptx](courseware/202609_DSA_W02_Intro_ADT_OOP.pptx) | 导论、ADT 与 OOP、Python 基础回顾 |
-| 第 3 周 | 算法分析 | [md](courseware/202609_DSA_W03_Algorithm_Analysis.md) | [pptx](courseware/202609_DSA_W03_Algorithm_Analysis.pptx) | 大 O、复杂度级别、Python 内建结构性能 |
-| 第 4 周 | 栈 | [md](courseware/202609_DSA_W04_Stack.md) | [pptx](courseware/202609_DSA_W04_Stack.pptx) | ADT、实现、括号匹配、进制转换、调度场算法 |
-| 第 5 周 | 队列、双端队列与链表 | [md](courseware/202609_DSA_W05_Queue_Deque_LinkedList.md) | [pptx](courseware/202609_DSA_W05_Queue_Deque_LinkedList.pptx) | 队列/双端队列；顺序表与链表对比；无序表与有序表 |
-| 第 6 周 | 递归、分治与排序 | [md](courseware/202610_DSA_W06_Recursion_Divide_Sorting.md) | [pptx](courseware/202610_DSA_W06_Recursion_Divide_Sorting.pptx) | 递归与分治；冒泡/选择/插入/归并/快排与性能对比 |
-| 第 7 周 | 贪心与动态规划 | [md](courseware/202610_DSA_W07_Greedy_DP.md) | [pptx](courseware/202610_DSA_W07_Greedy_DP.pptx) | 贪心选择性质、最优子结构、状态转移方程 |
-| 第 8 周 | 搜索专题 | [md](courseware/202610_DSA_W08_Search_DFS_BFS_Backtracking.md) | [pptx](courseware/202610_DSA_W08_Search_DFS_BFS_Backtracking.pptx) | DFS/BFS、回溯与剪枝 |
-| 第 9 周 | 树与二叉树遍历 | [md](courseware/202610_DSA_W09_Tree_Traversal.md) | [pptx](courseware/202610_DSA_W09_Tree_Traversal.pptx) | 树的概念；前中后序与层序遍历；建树 |
-| 第 10 周 | 堆与二叉搜索树 | [md](courseware/202611_DSA_W10_Heap_BST.md) | [pptx](courseware/202611_DSA_W10_Heap_BST.pptx) | 堆、堆排序、优先队列、BST |
-| 第 11 周 | AVL 树与并查集 | [md](courseware/202611_DSA_W11_AVL_DisjointSet.md) | [pptx](courseware/202611_DSA_W11_AVL_DisjointSet.pptx) | 平衡因子与四种旋转；路径压缩与按秩合并 |
-| 第 12 周 | 图的表示与遍历 | [md](courseware/202611_DSA_W12_Graph_Representation_Traversal.md) | [pptx](courseware/202611_DSA_W12_Graph_Representation_Traversal.pptx) | 邻接矩阵/邻接表；BFS 与 DFS；连通分量 |
-| 第 13 周 | 最短路 | [md](courseware/202611_DSA_W13_ShortestPath.md) | [pptx](courseware/202611_DSA_W13_ShortestPath.pptx) | Dijkstra、Bellman-Ford、Floyd-Warshall |
-| 第 14 周 | 最小生成树与拓扑排序 | [md](courseware/202612_DSA_W14_MST_TopoSort.md) | [pptx](courseware/202612_DSA_W14_MST_TopoSort.pptx) | Prim、Kruskal；Kahn 算法；DAG 应用 |
-| 第 15 周 | 散列表、KMP、倒排索引 → RAG | [md](courseware/202612_DSA_W15_Hash_KMP_InvertedIndex_RAG.md) | [pptx](courseware/202612_DSA_W15_Hash_KMP_InvertedIndex_RAG.pptx) | 冲突解决；next 数组；TF-IDF/BM25 与 RAG |
-| 第 16 周 | 课程总结与复习 | [md](courseware/202612_DSA_W16_Review.md) | [pptx](courseware/202612_DSA_W16_Review.pptx) | 知识体系梳理、模板代码库、考试要点 |
-| 第 17 周 | 期末上机考试 | [md](courseware/202612_DSA_W17_Final_Machine_Exam.md) | [pptx](courseware/202612_DSA_W17_Final_Machine_Exam.pptx) | 命题方案、样卷 6 题与参考解答、备选题库 |
+| 第 2 周 | 导论、ADT 与 OOP | [md](courseware_pre/202609_DSA_W02_Intro_ADT_OOP.md) | [pptx](courseware_pre/202609_DSA_W02_Intro_ADT_OOP.pptx) | 导论、ADT 与 OOP、Python 基础回顾 |
+| 第 3 周 | 算法分析 | [md](courseware_pre/202609_DSA_W03_Algorithm_Analysis.md) | [pptx](courseware_pre/202609_DSA_W03_Algorithm_Analysis.pptx) | 大 O、复杂度级别、Python 内建结构性能 |
+| 第 4 周 | 栈 | [md](courseware_pre/202609_DSA_W04_Stack.md) | [pptx](courseware_pre/202609_DSA_W04_Stack.pptx) | ADT、实现、括号匹配、进制转换、调度场算法 |
+| 第 5 周 | 队列、双端队列与链表 | [md](courseware_pre/202609_DSA_W05_Queue_Deque_LinkedList.md) | [pptx](courseware_pre/202609_DSA_W05_Queue_Deque_LinkedList.pptx) | 队列/双端队列；顺序表与链表对比；无序表与有序表 |
+| 第 6 周 | 递归、分治与排序 | [md](courseware_pre/202610_DSA_W06_Recursion_Divide_Sorting.md) | [pptx](courseware_pre/202610_DSA_W06_Recursion_Divide_Sorting.pptx) | 递归与分治；冒泡/选择/插入/归并/快排与性能对比 |
+| 第 7 周 | 贪心与动态规划 | [md](courseware_pre/202610_DSA_W07_Greedy_DP.md) | [pptx](courseware_pre/202610_DSA_W07_Greedy_DP.pptx) | 贪心选择性质、最优子结构、状态转移方程 |
+| 第 8 周 | 搜索专题 | [md](courseware_pre/202610_DSA_W08_Search_DFS_BFS_Backtracking.md) | [pptx](courseware_pre/202610_DSA_W08_Search_DFS_BFS_Backtracking.pptx) | DFS/BFS、回溯与剪枝 |
+| 第 9 周 | 树与二叉树遍历 | [md](courseware_pre/202610_DSA_W09_Tree_Traversal.md) | [pptx](courseware_pre/202610_DSA_W09_Tree_Traversal.pptx) | 树的概念；前中后序与层序遍历；建树 |
+| 第 10 周 | 堆与二叉搜索树 | [md](courseware_pre/202611_DSA_W10_Heap_BST.md) | [pptx](courseware_pre/202611_DSA_W10_Heap_BST.pptx) | 堆、堆排序、优先队列、BST |
+| 第 11 周 | AVL 树与并查集 | [md](courseware_pre/202611_DSA_W11_AVL_DisjointSet.md) | [pptx](courseware_pre/202611_DSA_W11_AVL_DisjointSet.pptx) | 平衡因子与四种旋转；路径压缩与按秩合并 |
+| 第 12 周 | 图的表示与遍历 | [md](courseware_pre/202611_DSA_W12_Graph_Representation_Traversal.md) | [pptx](courseware_pre/202611_DSA_W12_Graph_Representation_Traversal.pptx) | 邻接矩阵/邻接表；BFS 与 DFS；连通分量 |
+| 第 13 周 | 最短路 | [md](courseware_pre/202611_DSA_W13_ShortestPath.md) | [pptx](courseware_pre/202611_DSA_W13_ShortestPath.pptx) | Dijkstra、Bellman-Ford、Floyd-Warshall |
+| 第 14 周 | 最小生成树与拓扑排序 | [md](courseware_pre/202612_DSA_W14_MST_TopoSort.md) | [pptx](courseware_pre/202612_DSA_W14_MST_TopoSort.pptx) | Prim、Kruskal；Kahn 算法；DAG 应用 |
+| 第 15 周 | 散列表、KMP、倒排索引 → RAG | [md](courseware_pre/202612_DSA_W15_Hash_KMP_InvertedIndex_RAG.md) | [pptx](courseware_pre/202612_DSA_W15_Hash_KMP_InvertedIndex_RAG.pptx) | 冲突解决；next 数组；TF-IDF/BM25 与 RAG |
+| 第 16 周 | 课程总结与复习 | [md](courseware_pre/202612_DSA_W16_Review.md) | [pptx](courseware_pre/202612_DSA_W16_Review.pptx) | 知识体系梳理、模板代码库、考试要点 |
+| 第 17 周 | 期末上机考试 | [md](courseware_pre/202612_DSA_W17_Final_Machine_Exam.md) | [pptx](courseware_pre/202612_DSA_W17_Final_Machine_Exam.pptx) | 命题方案、样卷 6 题与参考解答、备选题库 |
 
 ### 重新生成课件
 
-课件由脚本从结构化内容生成（共 16 份、488 页），源码见 [`courseware/README.md`](courseware/README.md)：
+课件由脚本从结构化内容生成（共 16 份、488 页），源码见 [`courseware_pre/README.md`](courseware_pre/README.md)：
 
 ```bash
 pip install python-pptx
-cd courseware && python3 build_all.py        # 重新生成全部课件
+cd courseware_pre && python3 build_all.py    # 重新生成全部课件
 ```
 
 ### 校验与协作
 
-课件材料有一套回归闸门，改动 `courseware/` 后请跑一遍：
+课件材料有一套回归闸门；当前校验脚本仍按历史路径 `courseware/` 查找，改动 `courseware_pre/` 后需先同步脚本中的路径再运行：
 
 ```bash
 python3 tools/verify_courseware.py            # 配对/元数据/大纲对齐/链接/语法/可重生成
@@ -82,7 +90,7 @@ python3 tools/verify_courseware.py --render   # 追加：渲染 488 页并检查
 
 ------
 
-## 3 数算B-15班 课程安排
+## 4 数算B-15班 课程安排
 
 - **上课时间**：1–15 周，每周二 7–9 节（15:10–18:00）
 - **上课地点**：理教 410（150 座位）
@@ -99,7 +107,7 @@ python3 tools/verify_courseware.py --render   # 追加：渲染 488 页并检查
 
 ------
 
-## 4 预习与环境搭建指南
+## 5 预习与环境搭建指南
 
 > 课程主要使用 **Python**，如有同学坚持使用 **C++**，课程亦予以支持。
 
@@ -126,7 +134,7 @@ python3 tools/verify_courseware.py --render   # 追加：渲染 488 页并检查
 
 ------
 
-## 5 重要注意事项
+## 6 重要注意事项
 
 建议在开课前完成 **LeetCode 热题 100**。
 
