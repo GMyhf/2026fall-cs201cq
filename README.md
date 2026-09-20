@@ -56,9 +56,9 @@
 
 为夯实基础并培养算法思维，建议进行针对性练习：
 
-1.  **LeetCode 热题 100 (Top 100 Liked)**
-    *   [在线练习链接](https://leetcode.cn/studyplan/top-100-liked/)
-    *   重点掌握基础数据结构与高频算法题。
+- **LeetCode 热题 100 (Top 100 Liked)**
+  *   [在线练习链接](https://leetcode.cn/studyplan/top-100-liked/)
+  *   重点掌握基础数据结构与高频算法题。
 
 
 
