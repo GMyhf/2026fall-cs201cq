@@ -14,14 +14,11 @@
 
 ### 二、 作业提交步骤
 
-1. 登录后进入课程，依次点击左侧侧边栏：**「作业」** $\rightarrow$ **「DSA Assignment #1-2: 编程作业」**。
-   <div align="center">
-     <img src="https://raw.githubusercontent.com/GMyhf/img1/main/img1/image-20260923190738545.png" alt="作业入口" style="zoom: 33%;" />
-   </div>
-
+1. 登录后进入课程，依次点击左侧侧边栏：**「作业」** $\rightarrow$ **「DSA Assignment #1-3: 编程作业」**。
+   
 2. 点击右上角 **「开始任务」**，按页面要求上传并提交作业。
    <div align="center">
-     <img src="https://raw.githubusercontent.com/GMyhf/img1/main/img1/image-20260923191838006.png" alt="提交界面" style="zoom: 50%;" />
+     <img src="https://raw.githubusercontent.com/GMyhf/img1/main/2db7fb8be5f4b1531ee3a121d9d77cb8.png" alt="提交界面" style="zoom: 50%;" />
    </div>
 
 ---
