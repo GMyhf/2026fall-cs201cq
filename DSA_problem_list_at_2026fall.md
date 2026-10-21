@@ -1,5 +1,5 @@
 ## 2026fall 数算（DS Algo）每日选作
-*Updated 2026-10-13 14:30 GMT+8*  *Compiled by Hongfei Yan (2026 Fall)*  
+*Updated 2026-10-21 23:06 GMT+8*  *Compiled by Hongfei Yan (2026 Fall)*  
 https://github.com/GMyhf/2026fall-cs201/blob/main/DSA_problem_list_at_2026fall.md
 
 题解，https://fuynaloft.github.io/sol101/ ✅
@@ -14,7 +14,12 @@ https://github.com/GMyhf/2026fall-cs201/blob/main/DSA_problem_list_at_2026fall.m
 
 | 日期       | 问题编号与名称                 | 标签                                 | 难度 | 链接                                             |
 | ---------- | ------------------------------ | ------------------------------------ | ---- | ------------------------------------------------ |
-| 10 |       |       | Medium |  |
+|  |       |       | Medium |          |
+| 1027 | 31454:第一个 AA 型子串   | brute force   | Medium | http://cs101.openjudge.cn/practice/31454/          |
+| 1026 | M437.路径总和 III  | prefix sum, backtracking  | Medium | https://leetcode.cn/problems/path-sum-iii/          |
+| 1025 | 76.最小覆盖子串    | sliding window    | Tough | https://leetcode.cn/problems/minimum-window-substring/          |
+| 1024 | 04082: 树的镜面映射      | tree     | Medium | http://cs101.openjudge.cn/practice/04082/          |
+| 1023 | 31418:筛选法建最小堆的交换次数      | heap  | Easy | http://cs101.openjudge.cn/practice/31418/  |
 | 1022 | 30894: 哈夫曼编码树      | greedy    | Tough | http://cs101.openjudge.cn/practice/30894/          |
 | 1021 | 124.二叉树中的最大路径和      | dfs, dp, binary tree      | Tough | https://leetcode.cn/problems/binary-tree-maximum-path-sum/          |
 | 1020 | 236.二叉树的最近公共祖先  | dfs, binary tree | Medium | https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/          |
