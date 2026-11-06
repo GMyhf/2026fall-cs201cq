@@ -1,5 +1,5 @@
 ## 2026fall 数算（DS Algo）每日选作
-*Updated 2026-10-29 18:21 GMT+8*  *Compiled by Hongfei Yan (2026 Fall)*  
+*Updated 2026-11-06 15:02 GMT+8*  *Compiled by Hongfei Yan (2026 Fall)*  
 https://github.com/GMyhf/2026fall-cs201/blob/main/DSA_problem_list_at_2026fall.md
 
 题解，https://fuynaloft.github.io/sol101/ ✅
@@ -15,6 +15,9 @@ https://github.com/GMyhf/2026fall-cs201/blob/main/DSA_problem_list_at_2026fall.m
 | 日期       | 问题编号与名称                 | 标签                                 | 难度 | 链接                                             |
 | ---------- | ------------------------------ | ------------------------------------ | ---- | ------------------------------------------------ |
 |  |       |       | Medium |          |
+| 11 | M02524:宗教信仰      | dsu      | Medium | http://cs101.openjudge.cn/pctbook/M02524/         |
+| 11 | 01703:发现它，抓住它 | dsu      | Medium | http://cs101.openjudge.cn/practice/01703/         |
+| 11 | 04081:树的转换     | tree       | Medium | http://cs101.openjudge.cn/practice/04081/          |
 | 11 | P1262 [POI 1996 R3] 间谍网络  | SCC      | 绿色 普及+/提高 | https://www.luogu.com.cn/problem/P1262          |
 | 11 | P3387 【模板】缩点 | SCC      | 绿色 普及+/提高 | https://www.luogu.com.cn/problem/P3387          |
 | 11 | 427C. Checkposts   | SCC/dfs and similar, graphs, two pointers  | 1700 | https://codeforces.com/problemset/problem/427/C          |
@@ -22,16 +25,15 @@ https://github.com/GMyhf/2026fall-cs201/blob/main/DSA_problem_list_at_2026fall.m
 | 11 | 09202: 舰队、海域出击！   | topological order    | Medium    | http://cs101.openjudge.cn/practice/09202/      |
 | 11 | 05442: 兔子与星空 | MST   | Medium    | http://cs101.openjudge.cn/practice/05442/      |
 | 11 | 01258: Agri-Net   | MST    | Medium    | http://cs101.openjudge.cn/practice/01258/      |
-| 11 | 05443: 兔子与樱花 | dijkstra, Floyd-Warshall      | Medium | http://cs101.openjudge.cn/practice/05443/          |
 | 11 | 3629.通过质数传送到达终点的最少跳跃次数      | bfs, hash table, number theory       | Medium | https://leetcode.cn/problems/minimum-jumps-to-reach-end-via-prime-teleportation/          |
 | 11 | 3660.跳跃游戏 IX   | greedy, graph   | Medium | https://leetcode.cn/problems/jump-game-ix/          |
 | 11 | 30669: 地铁换乘    | LCA, binary lifting   | Tough | http://cs101.openjudge.cn/practice/30669/          |
 | 11 | M30720: 败方树的构建与维护    | tree       | Medium | http://cs101.openjudge.cn/practice/30720/          |
 | 11 | 27093: 排队又来了  | Segment Tree, Discretization（离散化）, binary search | Tough | http://cs101.openjudge.cn/practice/27093/          |
-|  | P8099 [USACO22JAN] Minimizing Haybales P | 线段树, 二分, 拓扑排序  | 紫色 省选/NOI- | https://www.luogu.com.cn/problem/P8099          |
-| 11 | 2502: Subway   | dijkstra | Tough | http://cs101.openjudge.cn/practice/02502/          |
-| 11 | 02442:Sequence     | heap, greedy      | Tough | http://cs101.openjudge.cn/practice/02442/          |
-| 11 | 2075C. Two Colors  | binary search, two pointers, combinatorics, math      | 1500 | https://codeforces.com/contest/2075/problem/C  |
+| 1110 | P8099 [USACO22JAN] Minimizing Haybales P | 线段树, 二分, 拓扑排序  | 紫色 省选/NOI- | https://www.luogu.com.cn/problem/P8099          |
+| 1109 | 2502: Subway   | dijkstra | Tough | http://cs101.openjudge.cn/practice/02502/          |
+| 1108 | 02442:Sequence     | heap, greedy      | Tough | http://cs101.openjudge.cn/practice/02442/          |
+| 1107 | 2075C. Two Colors  | binary search, two pointers, combinatorics, math      | 1500 | https://codeforces.com/contest/2075/problem/C  |
 | 1106 | 3742.网格中得分最大的路径     | dp     | Medium | https://leetcode.cn/problems/maximum-path-score-in-a-grid/          |
 | 1105 | 29803:穿越火线     | binary search + Dijkstra       | Tough | http://cs101.openjudge.cn/practice/29803/          |
 | 1104 | 28972:海拔      | Kruskal, binary+bfs, Dijkstra     | Tough | http://cs101.openjudge.cn/practice/28972          |
